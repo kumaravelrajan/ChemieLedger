@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+
+    <link
+      rel="apple-touch-icon"
+      sizes="57x57"
+      href="<%= BASE_URL %>favicon/apple-icon-57x57.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="60x60"
+      href="<%= BASE_URL %>favicon/apple-icon-60x60.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="72x72"
+      href="<%= BASE_URL %>favicon/apple-icon-72x72.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="76x76"
+      href="<%= BASE_URL %>favicon/apple-icon-76x76.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="114x114"
+      href="<%= BASE_URL %>favicon/apple-icon-114x114.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="120x120"
+      href="<%= BASE_URL %>favicon/apple-icon-120x120.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="144x144"
+      href="<%= BASE_URL %>favicon/apple-icon-144x144.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      href="<%= BASE_URL %>favicon/apple-icon-152x152.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="<%= BASE_URL %>favicon/apple-icon-180x180.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="<%= BASE_URL %>favicon/android-icon-192x192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="<%= BASE_URL %>favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="<%= BASE_URL %>favicon/favicon-96x96.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="<%= BASE_URL %>favicon/favicon-16x16.png"
+    />
+    <link rel="manifest" href="<%= BASE_URL %>favicon/manifest.json" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta
+      name="msapplication-TileImage"
+      content="<%= BASE_URL %>favicon/ms-icon-144x144.png"
+    />
+    <meta name="theme-color" content="#ffffff" />
+
+    <title></title>
+    <script type="text/javascript">
+      window.onload = function() {
+        var browser = get_browser();
+        var supported = true;
+        if (browser.name === "Chrome" && browser.version <= 48) {
+          supported = false;
+        } else if (browser.name === "Firefox" && browser.version <= 60) {
+          supported = false;
+        } else if (
+          (browser.name === "MSIE" || browser.name === "IE") &&
+          browser.version <= 11
+        ) {
+          supported = false;
+        }
+        if (!supported) {
+          var s = (document.getElementById("app").innerHTML =
+            "Dieser Browser wird leider nicht unterstützt. Bitte wechseln Sie zu einer aktuellen Version von z.B. Edge, Chrome oder Firefox.");
+          document.write(s);
+        }
+      };
+
+      function get_browser() {
+        var ua = navigator.userAgent,
+          tem,
+          M =
+            ua.match(
+              /(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i
+            ) || [];
+        if (/trident/i.test(M[1])) {
+          tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
+          return { name: "IE", version: tem[1] || "" };
+        }
+        if (M[1] === "Chrome") {
+          tem = ua.match(/\bOPR\/(\d+)/);
+          if (tem != null) {
+            return { name: "Opera", version: tem[1] };
+          }
+        }
+        if (window.navigator.userAgent.indexOf("Edge") > -1) {
+          tem = ua.match(/\Edge\/(\d+)/);
+          if (tem != null) {
+            return { name: "Edge", version: tem[1] };
+          }
+        }
+        M = M[2]
+          ? [M[1], M[2]]
+          : [navigator.appName, navigator.appVersion, "-?"];
+        if ((tem = ua.match(/version\/(\d+)/i)) != null) {
+          M.splice(1, 1, tem[1]);
+        }
+        return {
+          name: M[0],
+          version: +M[1]
+        };
+      }
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <strong
+        >Wir bedauern es, dass die Rohstoffbörse ohne die Aktivierung von
+        JavaScript nicht funktioniert. Bitte aktivieren Sie JavaScript, um
+        fortfahren zu können.</strong
+      >
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="230px" height="100px" viewBox="0 0 230 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>molecules/illustrations/magnifying_glass</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <ellipse id="path-1" cx="43.0405405" cy="42" rx="43.0405405" ry="42"></ellipse>
+        <path d="M58,49.7777778 L58,6.22222222 C58,2.8 55.1,0 51.5555556,0 L6.44444444,0 C2.9,0 0,2.8 0,6.22222222 L0,49.7777778 C0,53.2 2.9,56 6.44444444,56 L51.5555556,56 C55.1,56 58,53.2 58,49.7777778 L58,49.7777778 Z M15.5,20 L25.1428571,42.0733333 L38.6428571,9 L56,53 L2,53 L15.5,20 L15.5,20 Z" id="path-3"></path>
+    </defs>
+    <g id="molecules/illustrations/magnifying_glass" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(10.000000, 4.000000)">
+            <g id="content" transform="translate(23.364865, 0.000000)">
+                <g id="outer_content" transform="translate(46.648649, 21.800000)" stroke="#347CFF" stroke-linecap="round">
+                    <path d="M72.5817246,44.7 L137.986486,44.7" id="line" stroke-width="6"></path>
+                    <path d="M1.78060413,44.7 L54.9864865,44.7" id="line" stroke-width="6"></path>
+                    <path d="M1.78499395,32.7 L106.389472,32.7" id="line" stroke-width="6"></path>
+                    <path d="M1.78533706,20.7 L138.388785,20.7" id="line" stroke-width="6"></path>
+                    <path d="M0.785337061,0.7 L136.785337,0.7" id="line" stroke-width="10"></path>
+                </g>
+                <g id="inner_content">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <use id="Mask" fill="#FFFFFF" xlink:href="#path-1"></use>
+                    <path d="M38.5067568,30.6 L143.648649,30.6" id="line" stroke="#347CFF" stroke-width="10" stroke-linecap="round" mask="url(#mask-2)"></path>
+                    <path d="M38.5067568,51 L119.054054,51" id="line" stroke="#347CFF" stroke-width="10" stroke-linecap="round" mask="url(#mask-2)"></path>
+                    <path d="M38.5067568,71.4 L79.7027027,71.4" id="line" stroke="#347CFF" stroke-width="10" stroke-linecap="round" mask="url(#mask-2)"></path>
+                    <g id="atoms/icon/ic_image" mask="url(#mask-2)">
+                        <g transform="translate(-37.121622, 22.800000)">
+                            <g>
+                                <mask id="mask-4" fill="white">
+                                    <use xlink:href="#path-3"></use>
+                                </mask>
+                                <g id="Mask"></g>
+                                <g id="styleguide/color/blue_1" mask="url(#mask-4)" fill="#347CFF">
+                                    <rect id="Rectangle" x="0" y="0" width="58" height="56"></rect>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g id="magnifying-glass">
+                <path d="M2.64677169e-13,90 L27.0540541,69" id="handle" stroke="#979797" stroke-width="12" stroke-linecap="round"></path>
+                <ellipse id="inner_glass" fill-opacity="0.15" fill="#347CFF" cx="66.4054054" cy="42" rx="43.0405405" ry="42"></ellipse>
+                <ellipse id="flare" fill="#FFFFFF" style="mix-blend-mode: soft-light;" cx="81.1621622" cy="32.4" rx="14.7567568" ry="14.4"></ellipse>
+                <ellipse id="glass_frame" stroke="#5F5F5F" stroke-width="7" cx="66.4054054" cy="42" rx="43.0405405" ry="42"></ellipse>
+            </g>
+        </g>
+    </g>
+</svg>
