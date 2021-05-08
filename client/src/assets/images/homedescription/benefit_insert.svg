@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="230px" height="100px" viewBox="0 0 230 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>molecules/illustrations/benefit_insert</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M33,28.4444444 L33,3.55555556 C33,1.6 31.35,0 29.3333333,0 L3.66666667,0 C1.65,0 0,1.6 0,3.55555556 L0,28.4444444 C0,30.4 1.65,32 3.66666667,32 L29.3333333,32 C31.35,32 33,30.4 33,28.4444444 L33,28.4444444 Z M9.25,14 L14.4285714,24.0333333 L21.6785714,9 L31,29 L2,29 L9.25,14 L9.25,14 Z" id="path-1"></path>
+        <path d="M33,28.4444444 L33,3.55555556 C33,1.6 31.35,0 29.3333333,0 L3.66666667,0 C1.65,0 0,1.6 0,3.55555556 L0,28.4444444 C0,30.4 1.65,32 3.66666667,32 L29.3333333,32 C31.35,32 33,30.4 33,28.4444444 L33,28.4444444 Z M9.25,14 L14.4285714,24.0333333 L21.6785714,9 L31,29 L2,29 L9.25,14 L9.25,14 Z" id="path-3"></path>
+    </defs>
+    <g id="molecules/illustrations/benefit_insert" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(8.000000, 9.789130)">
+            <g id="content" transform="translate(59.000000, 48.210870)">
+                <g id="content_lines" transform="translate(43.355883, 2.133333)" stroke="#97BF0D" stroke-linecap="round" stroke-width="6">
+                    <path d="M0.627204186,1.82857143 L107.87912,1.82857143" id="line"></path>
+                    <path d="M0.627204186,14.0190476 L82.7909525,14.0190476" id="line"></path>
+                    <path d="M0.627204186,26.2095238 L42.6498846,26.2095238" id="line"></path>
+                    <path d="M56.4483767,26.2095238 L107.87912,26.2095238" id="line"></path>
+                </g>
+                <g id="atoms/icon/ic_image" transform="translate(0.422338, 0.000000)">
+                    <g>
+                        <mask id="mask-2" fill="white">
+                            <use xlink:href="#path-1"></use>
+                        </mask>
+                        <g id="Mask"></g>
+                        <g id="styleguide/color/blue_1" mask="url(#mask-2)" fill="#347CFF">
+                            <rect id="Rectangle" x="0" y="0" width="33" height="32"></rect>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g id="content" transform="translate(59.000000, 0.210870)">
+                <path d="M43.9830875,3.96190476 L151.235003,3.96190476" id="line" stroke="#5F5F5F" stroke-width="6" stroke-linecap="round"></path>
+                <path d="M43.9830875,16.152381 L126.146836,16.152381" id="line" stroke="#5F5F5F" stroke-width="6" stroke-linecap="round"></path>
+                <path d="M43.9830875,28.3428571 L86.005768,28.3428571" id="line" stroke="#5F5F5F" stroke-width="6" stroke-linecap="round"></path>
+                <path d="M99.8042601,28.3428571 L151.235003,28.3428571" id="line" stroke="#5F5F5F" stroke-width="6" stroke-linecap="round"></path>
+                <g id="atoms/icon/ic_image" transform="translate(0.422338, 0.000000)">
+                    <g>
+                        <mask id="mask-4" fill="white">
+                            <use xlink:href="#path-3"></use>
+                        </mask>
+                        <g id="Mask"></g>
+                        <g id="styleguide/color/grey-1#1" mask="url(#mask-4)" fill="#5F5F5F">
+                            <rect id="Rectangle" x="0" y="0" width="33" height="32"></rect>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g id="atoms/icon/pencil" transform="translate(0.000000, 28.210870)" fill="#5F5F5F">
+                <g transform="translate(25.500000, 25.500000) scale(-1, 1) translate(-25.500000, -25.500000) " id="Icon-Color">
+                    <path d="M0,39.7152659 L0,51 L11.2847341,51 L41.3773585,20.9073756 L30.0926244,9.62264151 L0,39.7152659 Z M11.5471698,47.1509434 L3.8490566,47.1509434 L3.8490566,39.4528302 L7.69811321,39.4528302 L7.69811321,43.3018868 L11.5471698,43.3018868 L11.5471698,47.1509434 Z M49.8968273,12.4177051 L44.9938374,17.3207547 L33.6792453,6.00602474 L38.5822352,1.10297509 C39.2869253,0.396829995 40.2435587,0 41.2411643,0 C42.2387699,0 43.1954033,0.396829995 43.9000935,1.10297509 L49.8968273,7.09978197 C51.3677242,8.57069687 51.3677242,10.9467902 49.8968273,12.4177051 Z"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
