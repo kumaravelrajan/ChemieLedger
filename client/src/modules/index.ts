@@ -1,4 +1,4 @@
-export { default as TopNavigation } from "./TopNavigation.vue.vue";
+export { default as TopNavigation } from "./TopNavigation/index.vue";
 export { default as Footer } from "./Footer.vue";
 export { default as LoginForm } from "./LoginForm.vue";
 export { default as RegisterForm } from "./RegisterForm.vue";

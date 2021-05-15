@@ -11,15 +11,15 @@ export function loginUser(data: {email: string, password: string}) {
 
 export function changeProfile(data: any) {
   return request({ url: '/auth/profile', method: 'patch', data });
-};
+}
 
 export function resetPasswordRequest(data: {email: string}) {
   return request({ url: '/auth/resetRequest', method: 'post', data });
-};
+}
 
 export function sendNewVerificationEmail() {
   return request({ url: '/auth/sendNewVerificationEmail', method: 'get'});
-};
+}
 
 export function resetPassword(data: {password: string}, token: string) {
   return request({ url: '/auth/resetPassword', method: 'post', data,
@@ -27,7 +27,7 @@ export function resetPassword(data: {password: string}, token: string) {
       Authorization: 'Bearer ' + token
     }
   });
-};
+}
 
 export function verifyEmail(token: string){
   return request({ url: '/auth/verifyEmail', method: 'get',
@@ -35,4 +35,4 @@ export function verifyEmail(token: string){
       Authorization: 'Bearer ' + token
     }
   });
-};
+}

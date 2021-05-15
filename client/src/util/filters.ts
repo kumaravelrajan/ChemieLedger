@@ -1,5 +1,5 @@
 import Vue from "vue";
-import * as moment from "moment";
+import moment from "moment";
 
 moment.locale('de')
 

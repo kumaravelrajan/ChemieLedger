@@ -23,7 +23,7 @@ router.beforeEach((to, from, next) => {
    * Delete old alerts when page changes
    */
   const alerts = store.getters[ALERT_STORE_KEY + "/" + ALERT_GET_ALERT];
-  for (var al in alerts) {
+  for (const al in alerts) {
     store.commit(ALERT_STORE_KEY + "/" + ALERT_DELETE_ALERT, al);
   }
 
