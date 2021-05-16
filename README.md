@@ -8,3 +8,4 @@ The blockchain repository for ChemieCluster's use case.
 - [Research topics](https://docs.google.com/document/d/1yCMPRwgHRPKA0jaCtZSMGuv33O2ja4qcje26ctTfBbs/edit?usp=sharing)
 - [Rohstoffboerse-by Fortiss](https://git.fortiss.org/RB)
 - [Blockchain research](https://docs.google.com/document/d/1NmyFKwBh1NVFMifMYfZyD00RWrnw5QZlaIJuj4dYCpc/edit?usp=sharing)
+- [Hyperledger Fabric](https://docs.google.com/document/d/1eGfT4uWQRGJ9JSbf6By4FNxupRlvFiG94IYJhwfGP6o/edit?usp=sharing )
