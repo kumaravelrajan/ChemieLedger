@@ -1,10 +1,10 @@
 export { default as TopNavigation } from "./TopNavigation/index.vue";
-export { default as Footer } from "./Footer.vue";
-export { default as LoginForm } from "./LoginForm.vue";
-export { default as RegisterForm } from "./RegisterForm.vue";
-export { default as AlertList } from "./AlertList.vue";
-export { default as UserCrud } from "./UserCrud.vue";
-export { default as ProductVerification } from "./ProductVerification.vue";
+export { default as Footer } from "./Footer/index.vue";
+export { default as LoginForm } from "./LoginForm/index.vue";
+export { default as RegisterForm } from "./RegisterForm/index.vue";
+export { default as AlertList } from "./AlertList/index.vue";
+export { default as UserCrud } from "./UserCrud/index.vue";
+export { default as ProductVerification } from "./ProductVerification/index.vue";
 export {
   default as ArticleOverviewList
 } from "./Editorial/ArticleOverviewList.vue";

@@ -2,7 +2,7 @@ export const STORE_KEY = "AUTHENTICATION";
 
 export const LOCAL_STORE_USER = "_user";
 
-export const GUEST_USER = {
+export const GUEST_USER: User = {
   _id: null,
   nickname: null,
   name: null,
@@ -35,11 +35,11 @@ export const ACTION_VERIFY_EMAIL = "VERIFY_EMAIL"
 
 
 export interface User {
-  _id: number,
-  nickname: string,
-  name: string,
-  surname: string,
-  email: string,
+  _id: number | null,
+  nickname: string | null,
+  name: string | null,
+  surname: string | null,
+  email: string | null,
   roles: string[],
   access_token: any,
   origin: any,

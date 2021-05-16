@@ -1,6 +1,6 @@
 const editorialRouter = {
   path: "/dashboard",
-  component: () => import("../../views/dashboard/DashboardLayout"),
+  component: () => import("../../views/dashboard/DashboardLayout.vue"),
   redirect: "/dashboard/profile",
   meta: {
     title: "Meine Aktivitäten",
@@ -10,7 +10,7 @@ const editorialRouter = {
   children: [
     {
       path: "communication",
-      component: () => import("../../views/dashboard/CommunicationView"),
+      component: () => import("../../views/dashboard/CommunicationView.vue"),
       meta: {
         title: "Anfragen",
         icon: "mail",
@@ -20,7 +20,7 @@ const editorialRouter = {
     },
     {
       path: "requests",
-      component: () => import("../../views/dashboard/OwnRequestsView"),
+      component: () => import("../../views/dashboard/OwnRequestsView.vue"),
       meta: {
         title: "Gesuche/Angebote",
         icon: "ballot",
@@ -29,7 +29,7 @@ const editorialRouter = {
     },
     {
       path: "whatchlist",
-      component: () => import("../../views/dashboard/WhatchlistView"),
+      component: () => import("../../views/dashboard/WhatchlistView.vue"),
       meta: {
         title: "Merkliste",
         icon: "favorite",
@@ -38,7 +38,7 @@ const editorialRouter = {
     },
     {
       path: "draft",
-      component: () => import("../../views/dashboard/OwnRequestsDraftView"),
+      component: () => import("../../views/dashboard/OwnRequestsDraftView.vue"),
       meta: {
         title: "Entwürfe",
         icon: "drafts",
@@ -47,7 +47,7 @@ const editorialRouter = {
     },
     {
       path: "archive",
-      component: () => import("../../views/dashboard/OwnRequestsArchiveView"),
+      component: () => import("../../views/dashboard/OwnRequestsArchiveView.vue"),
       meta: {
         title: "Archiv",
         icon: "archive",
@@ -56,7 +56,7 @@ const editorialRouter = {
     },
     {
       path: "profile",
-      component: () => import("../../views/dashboard/Profile"),
+      component: () => import("../../views/dashboard/Profile.vue"),
       meta: {
         title: "Profil",
         icon: "account_circle",

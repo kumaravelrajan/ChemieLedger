@@ -10,6 +10,7 @@ import {
   MUTATION_ADD_ALERT as ADD_ALERT
 } from '../store/modules/ALERT/constants';
 
+console.warn('VUE_APP_BASE_API', process.env.VUE_APP_BASE_API)
 // Base service object with basic options
 const request = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
@@ -32,6 +33,7 @@ request.interceptors.request.use(
 
 // Interceptor to handle, if the token is expired or not valid
 request.interceptors.response.use(undefined, error => {
+  console.warn(error)
   return new Promise(() => {
     if (
       error.response.status === 401 &&

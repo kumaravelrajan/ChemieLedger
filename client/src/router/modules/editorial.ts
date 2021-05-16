@@ -1,6 +1,6 @@
 const editorialRouter = {
   path: "/editorial",
-  component: () => import("../../views/editor/EditorLayout"),
+  component: () => import("../../views/editor/EditorLayout.vue"),
   redirect: "/editorial/overview",
   hidden: true,
   meta: {
@@ -10,7 +10,7 @@ const editorialRouter = {
   children: [
     {
       path: "overview",
-      component: () => import("../../views/editor/Overview"),
+      component: () => import("../../views/editor/Overview.vue"),
       meta: {
         title: "Redaktion",
         roles: ["admin", "editor"],
@@ -19,7 +19,7 @@ const editorialRouter = {
     },
     {
       path: "article/:id",
-      component: () => import("../../views/editor/CrudArticleView"),
+      component: () => import("../../views/editor/CrudArticleView.vue"),
       hidden: true,
       props: true,
       meta: {

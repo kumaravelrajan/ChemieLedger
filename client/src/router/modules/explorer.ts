@@ -1,6 +1,6 @@
 const explorerRouter = {
   path: "/explorer",
-  component: () => import("../../views/explorer/ExplorerLayout"),
+  component: () => import("../../views/explorer/ExplorerLayout.vue"),
   redirect: "/explorer/overview",
   hidden: true,
   meta: {
@@ -11,7 +11,7 @@ const explorerRouter = {
   children: [
     {
       path: "overview",
-      component: () => import("../../views/explorer/Overview"),
+      component: () => import("../../views/explorer/Overview.vue"),
       meta: {
         title: "Marktplatz",
         roles: ["regular", "editor", "admin"],
@@ -20,7 +20,7 @@ const explorerRouter = {
     },
     {
       path: "addoffer",
-      component: () => import("../../views/explorer/GenerateOffer"),
+      component: () => import("../../views/explorer/GenerateOffer.vue"),
       hidden: true,
       meta: {
         title: "Angebot erstellen",
@@ -29,7 +29,7 @@ const explorerRouter = {
     },
     {
       path: "addoffer/:productId",
-      component: () => import("../../views/explorer/GenerateOffer"),
+      component: () => import("../../views/explorer/GenerateOffer.vue"),
       hidden: true,
       props: true,
       meta: {
@@ -39,7 +39,7 @@ const explorerRouter = {
     },
     {
       path: "addrequest",
-      component: () => import("../../views/explorer/GenerateRequest"),
+      component: () => import("../../views/explorer/GenerateRequest.vue"),
       hidden: true,
       meta: {
         title: "Gesuch erstellen",
@@ -48,7 +48,7 @@ const explorerRouter = {
     },
     {
       path: "addrequest/:productId",
-      component: () => import("../../views/explorer/GenerateRequest"),
+      component: () => import("../../views/explorer/GenerateRequest.vue"),
       hidden: true,
       props: true,
       meta: {
@@ -58,7 +58,7 @@ const explorerRouter = {
     },
     {
       path: "viewrequest/:requestId",
-      component: () => import("../../views/explorer/RequestView"),
+      component: () => import("../../views/explorer/RequestView.vue"),
       hidden: true,
       props: true,
       meta: {
@@ -68,7 +68,7 @@ const explorerRouter = {
     },
     {
       path: "editrequest/:requestId",
-      component: () => import("../../views/explorer/EditRequestView"),
+      component: () => import("../../views/explorer/EditRequestView.vue"),
       hidden: true,
       props: true,
       meta: {

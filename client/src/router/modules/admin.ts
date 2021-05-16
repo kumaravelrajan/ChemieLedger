@@ -1,6 +1,6 @@
 const adminRouter = {
   path: "/admin",
-  component: () => import("../../views/admin/AdminLayout"),
+  component: () => import("../../views/admin/AdminLayout.vue"),
   redirect: "/admin/user",
   meta: {
     title: "Admin",
@@ -10,7 +10,7 @@ const adminRouter = {
   children: [
     {
       path: "user",
-      component: () => import("../../views/admin/UserManagement"),
+      component: () => import("../../views/admin/UserManagement.vue"),
       meta: {
         title: "User Management",
         roles: ["admin"]
@@ -18,7 +18,7 @@ const adminRouter = {
     },
     {
       path: "products",
-      component: () => import("../../views/admin/ProductVerificationView"),
+      component: () => import("../../views/admin/ProductVerificationView.vue"),
       meta: {
         title: "Produkt Freigabe",
         roles: ["admin"]

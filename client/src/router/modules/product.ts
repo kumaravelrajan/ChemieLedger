@@ -1,6 +1,6 @@
 const productRouter = {
   path: "/product",
-  component: () => import("../../views/product/ProductLayout"),
+  component: () => import("../../views/product/ProductLayout.vue"),
   redirect: "/product/overview",
   hidden: true,
   meta: {
@@ -9,7 +9,7 @@ const productRouter = {
   children: [
     {
       path: "overview",
-      component: () => import("../../views/general/Product"),
+      component: () => import("../../views/general/Product.vue"),
       hidden: true,
       meta: {
         title: "Produktkatalog",
@@ -18,7 +18,7 @@ const productRouter = {
     },
     {
       path: "productoverview",
-      component: () => import("../../views/product/ProductOverview"),
+      component: () => import("../../views/product/ProductOverview.vue"),
       meta: {
         title: "Produkte",
         roles: ["regular", "editor", "admin"],
@@ -27,7 +27,7 @@ const productRouter = {
     },
     {
       path: ":id",
-      component: () => import("../../views/product/ProductView"),
+      component: () => import("../../views/product/ProductView.vue"),
       hidden: true,
       props: true,
       meta: {
