@@ -15,8 +15,8 @@ import {
   State,
   User
 } from './constants';
-import { definedRoutes } from '../../../router';
-import { registerUser, loginUser, changeProfile, verifyEmail } from '../../../api/auth';
+import { definedRoutes } from '@/router';
+import { registerUser, loginUser, changeProfile, verifyEmail } from '@/api/auth';
 import { RouteConfig } from 'vue-router';
 
 /**

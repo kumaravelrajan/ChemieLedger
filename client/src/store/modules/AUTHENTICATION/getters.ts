@@ -13,24 +13,24 @@ import {
  * @param {Route} parentRoute if given, the path will be extended by the parent path
  * @param {boolean} guest if guest, the route.hidden is replaced by route.showGuestOnly
  */
-function filterVisibleRoutes(routes: RouteConfig[], parentRoute: RouteConfig | undefined = undefined) {
+function filterVisibleRoutes(routes: any[], parentRoute: RouteConfig | undefined = undefined) {
   let result: RouteConfig[] = [];
   routes.forEach(route => {
     const tmp = { ...route };
-    // if (!tmp.hidden) {
-    //   if (tmp.children) {
-    //     tmp.children = filterVisibleRoutes(tmp.children, tmp);
-    //   }
-    //   if (parentRoute && parentRoute.path != "/") {
-    //     tmp.path = parentRoute.path + "/" + tmp.path.replace("/", "");
-    //   }
-    //   result.push(tmp);
-    // } else {
-    if (tmp.children) {
-      const newRoutes = filterVisibleRoutes(tmp.children, tmp);
-      result = [...result, ...newRoutes];
+    if (!tmp.hidden) {
+      if (tmp.children) {
+        tmp.children = filterVisibleRoutes(tmp.children, tmp);
+      }
+      if (parentRoute && parentRoute.path != "/") {
+        tmp.path = parentRoute.path + "/" + tmp.path.replace("/", "");
+      }
+      result.push(tmp);
+    } else {
+      if (tmp.children) {
+        const newRoutes = filterVisibleRoutes(tmp.children, tmp);
+        result = [...result, ...newRoutes];
+      }
     }
-    // }
   });
   return result;
 }

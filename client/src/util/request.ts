@@ -10,7 +10,6 @@ import {
   MUTATION_ADD_ALERT as ADD_ALERT
 } from '../store/modules/ALERT/constants';
 
-console.warn('VUE_APP_BASE_API', process.env.VUE_APP_BASE_API)
 // Base service object with basic options
 const request = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
@@ -33,9 +32,9 @@ request.interceptors.request.use(
 
 // Interceptor to handle, if the token is expired or not valid
 request.interceptors.response.use(undefined, error => {
-  console.warn(error)
   return new Promise(() => {
     if (
+      error.reponse &&
       error.response.status === 401 &&
       error.response.config &&
       !error.response.config.__isRetryRequest &&
@@ -53,6 +52,7 @@ request.interceptors.response.use(undefined, error => {
       );
     }
     if (
+      error.reponse &&
       error.response.config &&
       !error.response.config.__isRetryRequest &&
       error.response.data &&
@@ -69,8 +69,14 @@ request.interceptors.response.use(undefined, error => {
           { root: true }
         );
       });
+    } else if (error.request) {
+      console.warn('Server not reachable! ')
+      throw error
+    } else {
+      console.warn('An error occurred when trying to reach the server! ', error)
+      throw error;
     }
-    throw error;
+    
   });
 });
 
