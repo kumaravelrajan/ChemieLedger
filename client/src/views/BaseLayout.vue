@@ -2,9 +2,9 @@
   <v-app>
     <TopNavigation />
     <AlertList style="position:fixed; z-index:5"/>
-    <v-content container--fluid>
+    <v-main container--fluid>
       <router-view :key="key" />
-    </v-content>
+    </v-main>
     <Footer />
   </v-app>
 </template>
