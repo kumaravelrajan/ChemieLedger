@@ -33,4 +33,4 @@
   - [https://ont.io/](https://ont.io/)
 
 - **Do sellers get to rate buyers?**: 
-  - (Yet to be decided)
+  - Yes. The review system acts both ways.
