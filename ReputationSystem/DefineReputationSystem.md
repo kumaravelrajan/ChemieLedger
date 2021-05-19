@@ -27,3 +27,7 @@
   - Current proposal:
 
     The users who rate other regularly get a badge reading "Active contributor" in their profile for everybody to see.
+
+- **Existing solutions?**:
+  - DREP foundation’s reputation system implementation - [https://www.drep.org/](https://www.drep.org/)
+  - [https://ont.io/](https://ont.io/)
