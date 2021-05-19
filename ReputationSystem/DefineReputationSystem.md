@@ -34,3 +34,6 @@
 
 - **Do sellers get to rate buyers?**: 
   - Yes. The review system acts both ways.
+
+- **Process flowchart of reputation system**:
+  - ![](./Images/ReputationSystemFlowchart.png)
