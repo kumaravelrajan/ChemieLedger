@@ -31,3 +31,6 @@
 - **Existing solutions?**:
   - DREP foundation’s reputation system implementation - [https://www.drep.org/](https://www.drep.org/)
   - [https://ont.io/](https://ont.io/)
+
+- **Do sellers get to rate buyers?**: 
+  - (Yet to be decided)
