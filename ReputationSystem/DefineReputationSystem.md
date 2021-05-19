@@ -11,6 +11,6 @@
 
   - Detailed review:
 
-    ![Detailed review](./Detailed)
+    ![Detailed review](./Detailed.png)
 
     The buyer gets to write a review on his experience with the seller. 
