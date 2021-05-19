@@ -14,3 +14,16 @@
     ![Detailed review](./Detailed.png)
 
     The buyer gets to write a review on his experience with the seller. 
+
+- **What actions increase/decrease reputation?**
+
+  A favourable/unfavourable review from the buyer.
+
+- **How do we aggregate actions?**
+  - Higher weights for recent actions
+  - High reputation user votes count more
+
+- **How do we encourage rating others?**
+  - Current proposal:
+
+    The users who rate other regularly get a badge reading "Active contributor" in their profile for everybody to see.
