@@ -12,14 +12,14 @@ import { jwtAuthentication } from './middlewares/passport'
 const authentication = express.Router()
 
 const validateLoginParams = validationMiddleware([
-  body('email', PARAM_EMAIL_FORMAT).normalizeEmail().isEmail(),
+  body('email', PARAM_EMAIL_FORMAT).normalizeEmail({"gmail_remove_dots": false }).isEmail(),
   body('password', PARAM_REQUIRED).exists().not().isEmpty()
 ])
 const validateRegisterParams = validationMiddleware([
   body('nickname', PARAM_REQUIRED).exists().not().isEmpty(),
   body('name', PARAM_REQUIRED).exists().not().isEmpty(),
   body('surname', PARAM_REQUIRED).exists().not().isEmpty(),
-  body('email', PARAM_EMAIL_FORMAT).isEmail().normalizeEmail(),
+  body('email', PARAM_EMAIL_FORMAT).isEmail().normalizeEmail({"gmail_remove_dots": false }),
   body('password', PARAM_REQUIRED)
     .exists()
     .not()
@@ -34,7 +34,7 @@ const validateProfileParams = validationMiddleware([
   body('origin').optional()
 ])
 const validateEmailParams = validationMiddleware([
-  body('email', PARAM_EMAIL_FORMAT).normalizeEmail().isEmail()
+  body('email', PARAM_EMAIL_FORMAT).normalizeEmail({"gmail_remove_dots": false }).isEmail()
 ])
 const validateResetPassword = validationMiddleware([
   body('password', PARAM_REQUIRED).exists().not().isEmpty()
