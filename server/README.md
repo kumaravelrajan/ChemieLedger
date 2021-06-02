@@ -3,37 +3,37 @@
 ## Project setup
 
 ```
-npm install
+yarn
 ```
 
 ### Compiles and hot-reloads for development
 
 ```
-npm run server
+yarn server
 ```
 
 ### Compiles and minifies for production
 
 ```
-npm run build
+yarn build
 ```
 
 ### Lints files
 
 ```
-npm run lint
+yarn lint
 ```
 
 ### Lints and fixes files
 
 ```
-npm run fixlint
+yarn fixlint
 ```
 
 ### Run tests if specified
 
 ```
-npm run test
+yarn test
 ```
 
 ### Customize configuration
