@@ -1,6 +1,4 @@
-# Clean restart
-# sudo find /tmp/hyperledger -type f -delete
-
+set -e
 echo " --------> Setup TLS CA"
 echo " --------> Enroll TLS CA’s Admin"
 docker-compose up -d ca-tls
@@ -101,6 +99,9 @@ cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/peer
 mkdir -p /tmp/hyperledger/org1/peer2/msp/admincerts
 cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/peer2/msp/admincerts/org1-admin-cert.pem
 
+mkdir -p /tmp/hyperledger/org1/admin/msp/admincerts/
+cp /tmp/hyperledger/org1/peer1/msp/admincerts/org1-admin-cert.pem /tmp/hyperledger/org1/admin/msp/admincerts/org1-admin-cert.pem
+
 echo " --------> Launch Org1’s Peers"
 docker-compose up -d peer1-org1
 docker-compose up -d peer2-org1
@@ -156,6 +157,9 @@ cp /tmp/hyperledger/org2/admin/msp/signcerts/cert.pem /tmp/hyperledger/org2/peer
 mkdir -p /tmp/hyperledger/org2/peer2/msp/admincerts
 cp /tmp/hyperledger/org2/admin/msp/signcerts/cert.pem /tmp/hyperledger/org2/peer2/msp/admincerts/org2-admin-cert.pem
 
+mkdir -p /tmp/hyperledger/org2/admin/msp/admincerts/
+cp /tmp/hyperledger/org2/peer1/msp/admincerts/org2-admin-cert.pem /tmp/hyperledger/org2/admin/msp/admincerts/org2-admin-cert.pem
+
 docker-compose up -d peer1-org2
 docker-compose up -d peer2-org2
 
@@ -188,20 +192,50 @@ mkdir -p /tmp/hyperledger/org0/orderer/msp/admincerts
 cp /tmp/hyperledger/org0/admin/msp/signcerts/cert.pem /tmp/hyperledger/org0/orderer/msp/admincerts/orderer-admin-cert.pem
 
 
-
-
-
 echo " --------> Create Genesis Block and Channel Transaction"
 
 mkdir -p /tmp/hyperledger/org0/msp/admincerts
+cp /tmp/hyperledger/org0/admin/msp/signcerts/cert.pem /tmp/hyperledger/org0/msp/admincerts/admin-org0-cert.pem
 mkdir -p /tmp/hyperledger/org0/msp/cacerts
+cp /tmp/hyperledger/org0/ca/crypto/ca-cert.pem /tmp/hyperledger/org0/msp/cacerts/org0-ca-cert.pem
 mkdir -p /tmp/hyperledger/org0/msp/tlscacerts
+cp /tmp/hyperledger/tls-ca/crypto/ca-cert.pem /tmp/hyperledger/org0/msp/tlscacerts/tls-ca-cert.pem
+
+mkdir -p /tmp/hyperledger/org1/msp/admincerts
+cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/msp/admincerts/admin-org1-cert.pem
+mkdir -p /tmp/hyperledger/org1/msp/cacerts
+cp /tmp/hyperledger/org1/ca/crypto/ca-cert.pem /tmp/hyperledger/org1/msp/cacerts/org1-ca-cert.pem
+mkdir -p /tmp/hyperledger/org1/msp/tlscacerts
+cp /tmp/hyperledger/tls-ca/crypto/ca-cert.pem /tmp/hyperledger/org1/msp/tlscacerts/tls-ca-cert.pem
+
+mkdir -p /tmp/hyperledger/org2/msp/admincerts
+cp /tmp/hyperledger/org2/admin/msp/signcerts/cert.pem /tmp/hyperledger/org2/msp/admincerts/admin-org2-cert.pem
+mkdir -p /tmp/hyperledger/org2/msp/cacerts
+cp /tmp/hyperledger/org2/ca/crypto/ca-cert.pem /tmp/hyperledger/org2/msp/cacerts/org2-ca-cert.pem
+mkdir -p /tmp/hyperledger/org2/msp/tlscacerts
+cp /tmp/hyperledger/tls-ca/crypto/ca-cert.pem /tmp/hyperledger/org2/msp/tlscacerts/tls-ca-cert.pem
 
 
+configtxgen -profile OrgsOrdererGenesis -outputBlock /tmp/hyperledger/org0/orderer/genesis.block -channelID syschannel
+configtxgen -profile OrgsChannel -outputCreateChannelTx /tmp/hyperledger/org0/orderer/channel.tx -channelID mychannel
 
-# configtxgen -profile OrgsOrdererGenesis -outputBlock /tmp/hyperledger/org0/orderer/genesis.block -channelID syschannel
-# configtxgen -profile OrgsChannel -outputCreateChannelTx /tmp/hyperledger/org0/orderer/channel.tx -channelID mychannel
+echo " --------> Launch Orderer"
+docker-compose up -d orderer1-org0
 
-echo " --------> TODO https://hyperledger-fabric-ca.readthedocs.io/en/latest/operations_guide.html#create-genesis-block-and-channel-transaction"
+echo " --------> Create CLI Containers"
+echo " --------> Launch Org1’s CLI"
+docker-compose up -d cli-org1
+
+echo " --------> Launch Org2’s CLI"
+docker-compose up -d cli-org2
+
+mkdir -p /tmp/hyperledger/org1/admin/msp/admincerts/
+cp /tmp/hyperledger/org1/peer1/msp/admincerts/org1-admin-cert.pem /tmp/hyperledger/org1/admin/msp/admincerts/org1-admin-cert.pem
 
 
+echo " --------> Create and Join Channel"
+
+cp /tmp/hyperledger/org0/orderer/channel.tx /tmp/hyperledger/org1/peer1/assets/channel.tx
+
+# export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp
+# peer channel create -c mychannel -f /tmp/hyperledger/org1/peer1/assets/channel.tx -o orderer1-org0:7050 --outputBlock /tmp/hyperledger/org1/peer1/assets/mychannel.block --tls --cafile /tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
