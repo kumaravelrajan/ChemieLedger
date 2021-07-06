@@ -7,12 +7,18 @@
         "moduleResolution": "node",
         "module": "commonjs",
         "declaration": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "lib": ["es2017"],
+        "types": [
+            "node",
+            "mocha",
+            "chai"
+        ]
     },
     "include": [
         "./src/**/*"
     ],
     "exclude": [
-        "./src/**/*.spec.ts"
+        // "./src/**/*.spec.ts"
     ]
 }
