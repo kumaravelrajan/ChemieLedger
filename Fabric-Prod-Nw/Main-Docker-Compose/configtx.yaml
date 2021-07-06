@@ -55,16 +55,16 @@ Organizations:
    Policies:
       Readers:
             Type: Signature
-            Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client')"
+            Rule: "OR('org1MSP.admin', 'org1MSP.peer', 'org1MSP.client')"
       Writers:
             Type: Signature
-            Rule: "OR('Org1MSP.admin', 'Org1MSP.client')"
+            Rule: "OR('org1MSP.admin', 'org1MSP.client')"
       Admins:
             Type: Signature
-            Rule: "OR('Org1MSP.admin')"
+            Rule: "OR('org1MSP.admin')"
       Endorsement:
             Type: Signature
-            Rule: "OR('Org1MSP.peer')"
+            Rule: "OR('org1MSP.peer')"
 
 - &org2
 
@@ -89,16 +89,16 @@ Organizations:
    Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('Org2MSP.admin', 'Org2MSP.peer', 'Org2MSP.client')"
+                Rule: "OR('org2MSP.admin', 'org2MSP.peer', 'org2MSP.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('Org2MSP.admin', 'Org2MSP.client')"
+                Rule: "OR('org2MSP.admin', 'org2MSP.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('Org2MSP.admin')"
+                Rule: "OR('org2MSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('Org2MSP.peer')"
+                Rule: "OR('org2MSP.peer')"
 
 ################################################################################
 #
