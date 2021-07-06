@@ -262,7 +262,6 @@ cp /tmp/hyperledger/org0/orderer/channel.tx /tmp/hyperledger/org2/peer1/assets/c
 infoln "peer1-org1 Creating channel and peer1-org1 and peer2-org1 joining channel"
 docker exec -it cli-org1 sh -c "export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp \
 && peer channel create -c mychannel -f /tmp/hyperledger/org1/peer1/assets/channel.tx -o orderer1-org0:7050 --outputBlock /tmp/hyperledger/org1/peer1/assets/mychannel.block --tls --cafile /tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem \
-&& export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp \
 && export CORE_PEER_ADDRESS=peer1-org1:7051 \
 && peer channel join -b /tmp/hyperledger/org1/peer1/assets/mychannel.block \
 && export CORE_PEER_ADDRESS=peer2-org1:7051 \
@@ -284,7 +283,6 @@ docker exec -it cli-org1 sh -c "export CORE_PEER_ADDRESS=peer1-org1:7051 \
 && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp \
 && peer chaincode install -n mycc -v 1.0 -p github.com/hyperledger/fabric-samples/chaincode/abac/go \
 && export CORE_PEER_ADDRESS=peer2-org1:7051 \
-&& export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp \
 && peer chaincode install -n mycc -v 1.0 -p github.com/hyperledger/fabric-samples/chaincode/abac/go"
 
 infoln "Org2 and instantiate chaincode"
@@ -292,6 +290,6 @@ docker exec -it cli-org2 sh -c "export CORE_PEER_ADDRESS=peer1-org2:7051 \
 && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp \
 && peer chaincode install -n mycc -v 1.0 -p github.com/hyperledger/fabric-samples/chaincode/abac/go \
 && export CORE_PEER_ADDRESS=peer2-org2:7051 \
-&& export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp \
-&& peer chaincode install -n mycc -v 1.0 -p github.com/hyperledger/fabric-samples/chaincode/abac/go" #\
-#&& peer chaincode instantiate -C mychannel -n mycc -v 1.0 -c '{\"Args\":[\"init\",\"a\",\"100\",\"b\",\"200\"]}' -o orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"
+&& export CORE_PEER_LOCALMSPID=org2MSP  \
+&& peer chaincode install -n mycc -v 1.0 -p github.com/hyperledger/fabric-samples/chaincode/abac/go \
+&& peer chaincode instantiate -C mychannel -n mycc -v 1.0 -c '{\"Args\":[\"init\",\"a\",\"100\",\"b\",\"200\"]}' -o orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"
