@@ -1,5 +1,5 @@
 import { Context, Contract, Info, Transaction } from 'fabric-contract-api';
-import { Product, ProductHistory, Trade, Unit } from './models';
+import { Location, Product, ProductHistory, ProductMaterial, Trade, Unit } from './models';
 import getUuid = require('uuid-by-string');
 
 @Info({ title: 'RecycleChain', description: 'Smart contract for recycle chain'})
@@ -41,35 +41,67 @@ export class RecycleChainContract extends Contract {
         productName: string,
         amount: number,
         unit: Unit,
-        dateOfProduction: Date,
-        locationOfProduction: {x: string, y: string},
-        certificates?: string[],
-        productMaterial?: {[ID: string]: number}): Promise<string> {
-        const owner = this.getIdentity(context);
-        const product: Product = {
-            ID: this.nextID(),
-            productName,
-            owner,
-            amount,
-            unit,
-            dateOfProduction,
-            locationOfProduction,
-            certificates,
-            productMaterial
-        }
-        this.writeToState(context, product.ID, product)
-        return product.ID
+        dateOfProduction: number,
+        _locationOfProduction: string,
+        _certificates?: string,
+        _productMaterial?: string): Promise<Product> {
+
+            const owner = this.getIdentity(context);
+            
+            if (productName.length === 0 || productName.length > 100) { throw new Error(`ProductName must have between 0 and 100 characters`) }
+            amount = parseFloat('' + amount)
+            if (amount <= 0.) { throw new Error(`Amount must be a positive float but was ${amount}`)}
+            if (!Object.values(Unit).includes(unit)) { throw new Error(`Unit must be one of ${Object.values(Unit)}`) }
+            dateOfProduction = parseFloat('' + dateOfProduction)
+            if (dateOfProduction > Date.now()) { throw new Error(`Your date is in the future! ${dateOfProduction}`) }
+            let locationOfProduction: Location = JSON.parse(_locationOfProduction);
+            locationOfProduction = {x: locationOfProduction.x, y: locationOfProduction.y}
+            let certificates: string[];
+            if (_certificates !== undefined) {
+                certificates = JSON.parse(_certificates);
+                if (certificates.some(x => typeof x !== 'string')) { throw new Error(`Certificates must be a list of strings!`) }
+            }
+            let productMaterial: ProductMaterial;
+            if(_productMaterial !== undefined) {
+                productMaterial = JSON.parse(_productMaterial);
+                for(let [material, req_amount] of Object.entries(productMaterial)) {
+                    const trade: Trade = await this.readObjectFromState(context, material);
+                    if (trade.buyer !== owner) { throw new Error(`The caller was not the buyer in the Trade ${material} referenced in the list of materials!`)  }
+                    if (req_amount <= 0 || trade.amountAvailable < amount) { 
+                        throw new Error(`Only ${trade.amountAvailable}${trade.unit} of trade ${material} are available, but ${req_amount}${trade.unit} were requested!`)
+                    }
+                }
+            }
+
+            const product: Product = {
+                ID: this.nextID(),
+                productName,
+                owner,
+                amount,
+                unit,
+                dateOfProduction,
+                locationOfProduction,
+                certificates,
+                productMaterial
+            }
+            this.writeToState(context, product.ID, product)
+            return product
     }
 
     @Transaction()
-    public async addTrade(context: Context, productID: string, buyer: string, amountTransferred: number): Promise<string> {
+    public async getProduct(context: Context, productID: string): Promise<Product> {
+        return await this.readObjectFromState(context, productID) as Product;
+    }
+
+    @Transaction()
+    public async addTrade(context: Context, productID: string, buyer: string, amountTransferred: number): Promise<Trade> {
         const seller = this.getIdentity(context);
         const product: Product = await this.readObjectFromState(context, productID);
         if (product.owner !== seller) {
             throw Error(`Product with ID ${productID} does not belong to this seller!`)
         }
-        if (product.amount >= amountTransferred) {
-            throw Error(`Product with ID ${productID} has a total available amount of ${product.amount}${product.unit}, but ${amountTransferred}}${product.unit} were requested!`)
+        if (product.amount < amountTransferred) {
+            throw Error(`Product with ID ${productID} has a total available amount of ${product.amount}${product.unit}, but ${amountTransferred}${product.unit} were requested!`)
         }
         const trade: Trade = {
             ID: this.nextID(),
@@ -77,12 +109,13 @@ export class RecycleChainContract extends Contract {
             seller,
             buyer,
             amountTransferred,
-            amountAvailable: amountTransferred
+            amountAvailable: amountTransferred,
+            unit: product.unit
         }
         product.amount = product.amount - amountTransferred;
-        this.writeToState(context, productID, product.amount);
+        this.writeToState(context, productID, product);
         this.writeToState(context, trade.ID, trade);
-        return trade.ID
+        return trade
     }
 
     @Transaction()
@@ -95,12 +128,11 @@ export class RecycleChainContract extends Contract {
         const product: Product = await this.readObjectFromState(context, productID);
         const productHistory: ProductHistory = {
             product,
-            productMaterial: []
+            productMaterial: [] as [ProductHistory, number][]
         }
         for (const [tradeID, amount] of Object.entries(product.productMaterial || {})) {
             const trade: Trade = await this.readObjectFromState(context, tradeID);
-            const material: Product = await this.readObjectFromState(context, tradeID);
-            productHistory.productMaterial.push(await this.buildProductHistoryRec(context, material.ID));
+            productHistory.productMaterial.push([await this.buildProductHistoryRec(context, trade.productID), trade.amountTransferred]);
         }
         return productHistory;
     }
