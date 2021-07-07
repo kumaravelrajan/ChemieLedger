@@ -21,9 +21,9 @@ export interface Product {
     /** Location where the product was produced */
     locationOfProduction: Location
     /** List of official certificates applicable to this product */
-    certificates?: string[],
+    certificates: string[],
     /** List of tradeIDs referring to a received prodcut and their respective amount that were used to create his product. */
-    productMaterial?: ProductMaterial
+    productMaterial: ProductMaterial
 }
 
 export interface Trade {

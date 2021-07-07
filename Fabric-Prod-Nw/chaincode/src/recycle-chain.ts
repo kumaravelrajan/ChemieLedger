@@ -5,6 +5,17 @@ import getUuid = require('uuid-by-string');
 @Info({ title: 'RecycleChain', description: 'Smart contract for recycle chain'})
 export class RecycleChainContract extends Contract {
 
+    /**
+     * Instantiate to perform any setup of the ledger that might be required.
+     * @param {Context} ctx the transaction context
+     */
+     @Transaction()
+    public async instantiate(ctx: Context) {
+        // No implementation required with this example
+        // It could be where data migration is performed, if necessary
+        console.log('Instantiate the contract');
+    }
+
     IDCounter = 0
     private nextID(): string {
         this.IDCounter += 1
@@ -43,8 +54,8 @@ export class RecycleChainContract extends Contract {
         unit: Unit,
         dateOfProduction: number,
         _locationOfProduction: string,
-        _certificates?: string,
-        _productMaterial?: string): Promise<Product> {
+        _certificates: string,
+        _productMaterial: string): Promise<Product> {
 
             const owner = this.getIdentity(context);
             
@@ -56,20 +67,14 @@ export class RecycleChainContract extends Contract {
             if (dateOfProduction > Date.now()) { throw new Error(`Your date is in the future! ${dateOfProduction}`) }
             let locationOfProduction: Location = JSON.parse(_locationOfProduction);
             locationOfProduction = {x: locationOfProduction.x, y: locationOfProduction.y}
-            let certificates: string[];
-            if (_certificates !== undefined) {
-                certificates = JSON.parse(_certificates);
-                if (certificates.some(x => typeof x !== 'string')) { throw new Error(`Certificates must be a list of strings!`) }
-            }
-            let productMaterial: ProductMaterial;
-            if(_productMaterial !== undefined) {
-                productMaterial = JSON.parse(_productMaterial);
-                for(let [material, req_amount] of Object.entries(productMaterial)) {
-                    const trade: Trade = await this.readObjectFromState(context, material);
-                    if (trade.buyer !== owner) { throw new Error(`The caller was not the buyer in the Trade ${material} referenced in the list of materials!`)  }
-                    if (req_amount <= 0 || trade.amountAvailable < amount) { 
-                        throw new Error(`Only ${trade.amountAvailable}${trade.unit} of trade ${material} are available, but ${req_amount}${trade.unit} were requested!`)
-                    }
+            let certificates: string[] = JSON.parse(_certificates);
+            if (certificates.some(x => typeof x !== 'string')) { throw new Error(`Certificates must be a list of strings!`) }
+            let productMaterial: ProductMaterial = JSON.parse(_productMaterial);
+            for(let [material, req_amount] of Object.entries(productMaterial)) {
+                const trade: Trade = await this.readObjectFromState(context, material);
+                if (trade.buyer !== owner) { throw new Error(`The caller was not the buyer in the Trade ${material} referenced in the list of materials!`)  }
+                if (req_amount <= 0 || trade.amountAvailable < amount) { 
+                    throw new Error(`Only ${trade.amountAvailable}${trade.unit} of trade ${material} are available, but ${req_amount}${trade.unit} were requested!`)
                 }
             }
 

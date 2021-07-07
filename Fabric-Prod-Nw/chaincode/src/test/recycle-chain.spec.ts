@@ -49,12 +49,13 @@ describe('Recycle-Chain', () => {
         amount: 52.4,
         unit: Unit.Kilogram,
         dateOfProduction: Date.now(),
-        locationOfProduction: {x: 0, y: 0} as Location
+        locationOfProduction: {x: 0, y: 0},
+        certificates: [],
+        productMaterial: {}
       }
-      const keys = ['productName', 'amount', 'unit', 'dateOfProduction', 'locationOfProduction']
-      const params = parseArgs(p, keys);
-      const product: Product = await cc.addProduct(ctx, ...params as [string, number, Unit, number, string]);
-      expect(JSON.stringify(parseArgs(product, keys)) === JSON.stringify(params)).to.be.true;
+      const params = parseArgs(p, Object.keys(p));
+      const product: Product = await cc.addProduct(ctx, ...params as [string, number, Unit, number, string, string, string]);
+      expect(JSON.stringify(parseArgs(product, Object.keys(p))) === JSON.stringify(params)).to.be.true;
     });
 
     it('Get valid product', async () => {
@@ -65,12 +66,13 @@ describe('Recycle-Chain', () => {
         amount: 52.4,
         unit: Unit.Kilogram,
         dateOfProduction: Date.now(),
-        locationOfProduction: {x: 0, y: 0} as Location
+        locationOfProduction: {x: 0, y: 0},
+        certificates: [],
+        productMaterial: {}
       }
-      const keys = ['productName', 'amount', 'unit', 'dateOfProduction', 'locationOfProduction']
-      const params = parseArgs(p, keys);
-      const product: Product = await cc.addProduct(ctx, ...params as [string, number, Unit, number, string]);
-      expect(JSON.stringify(parseArgs(product, keys)) === JSON.stringify(params)).to.be.true;
+      const params = parseArgs(p, Object.keys(p));
+      const product: Product = await cc.addProduct(ctx, ...params as [string, number, Unit, number, string, string, string]);
+      expect(JSON.stringify(parseArgs(product, Object.keys(p))) === JSON.stringify(params)).to.be.true;
       const p2: Product = await cc.getProduct(ctx, product.ID);
       expect(JSON.stringify(product)).to.equal(JSON.stringify(p2));
     });
@@ -88,11 +90,12 @@ describe('Recycle-Chain', () => {
         amount: 52.4,
         unit: Unit.Kilogram,
         dateOfProduction: Date.now(),
-        locationOfProduction: {x: 0, y: 0} as Location
+        locationOfProduction: {x: 0, y: 0},
+        certificates: [],
+        productMaterial: {}
       }
-      const keys = ['productName', 'amount', 'unit', 'dateOfProduction', 'locationOfProduction']
-      const params = parseArgs(p, keys);
-      const product: Product = await cc.addProduct(ctx, ...params as [string, number, Unit, number, string]);
+      const params = parseArgs(p, Object.keys(p));
+      const product: Product = await cc.addProduct(ctx, ...params as [string, number, Unit, number, string, string, string]);
 
       const transferAmount = 36.2
       const trade: Trade = await cc.addTrade(ctx, product.ID,`${userB.getMSPID()}#${userB.getID()}`, transferAmount);
