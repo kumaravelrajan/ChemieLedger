@@ -55,16 +55,16 @@ Organizations:
    Policies:
       Readers:
             Type: Signature
-            Rule: "OR('org1MSP.admin', 'org1MSP.peer', 'org1MSP.client')"
+            Rule: "OR('org1MSP.admin', 'org1MSP.peer', 'org1MSP.client', 'org1MSP.member')"
       Writers:
             Type: Signature
-            Rule: "OR('org1MSP.admin', 'org1MSP.client')"
+            Rule: "OR('org1MSP.admin', 'org1MSP.client', 'org1MSP.member')"
       Admins:
             Type: Signature
             Rule: "OR('org1MSP.admin')"
       Endorsement:
             Type: Signature
-            Rule: "OR('org1MSP.peer')"
+            Rule: "OR('org1MSP.peer', 'org1MSP.admin')"
 
 - &org2
 
@@ -89,16 +89,16 @@ Organizations:
    Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('org2MSP.admin', 'org2MSP.peer', 'org2MSP.client')"
+                Rule: "OR('org2MSP.admin', 'org2MSP.peer', 'org2MSP.client', 'org2MSP.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('org2MSP.admin', 'org2MSP.client')"
+                Rule: "OR('org2MSP.admin', 'org2MSP.client', 'org2MSP.member')"
             Admins:
                 Type: Signature
                 Rule: "OR('org2MSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('org2MSP.peer')"
+                Rule: "OR('org2MSP.peer', 'org2MSP.admin')"
 
 ################################################################################
 #
@@ -242,7 +242,7 @@ Profiles:
          # Available types are "solo" and "kafka"
          OrdererType: solo
          Addresses:
-         - orderer1-org0:7050
+            - orderer1-org0:7050
 
          # Batch Timeout: The amount of time to wait before creating a batch
          BatchTimeout: 2s
