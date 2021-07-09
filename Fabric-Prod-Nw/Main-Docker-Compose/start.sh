@@ -115,16 +115,6 @@ export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org1/peer1/assets/ca/ca-c
 export FABRIC_CA_CLIENT_MSPDIR=msp
 fabric-ca-client enroll -d -u https://admin-org1:org1AdminPW@0.0.0.0:7054
 
-# mkdir -p /tmp/hyperledger/org1/peer1/msp/admincerts
-# cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/peer1/msp/admincerts/org1-admin-cert.pem
-
-# mkdir -p /tmp/hyperledger/org1/peer2/msp/admincerts
-# cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/peer2/msp/admincerts/org1-admin-cert.pem
-
-# mkdir -p /tmp/hyperledger/org1/admin/msp/admincerts/
-# cp /tmp/hyperledger/org1/peer1/msp/admincerts/org1-admin-cert.pem /tmp/hyperledger/org1/admin/msp/admincerts/org1-admin-cert.pem
-
-
 echo 'NodeOUs:
   Enable: true
   ClientOUIdentifier:
@@ -246,9 +236,6 @@ export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org0/orderer/assets/ca/ca
 export FABRIC_CA_CLIENT_MSPDIR=msp
 fabric-ca-client enroll -d -u https://admin-org0:org0adminpw@0.0.0.0:7053
 
-# mkdir -p /tmp/hyperledger/org0/orderer/msp/admincerts
-# cp /tmp/hyperledger/org0/admin/msp/signcerts/cert.pem /tmp/hyperledger/org0/orderer/msp/admincerts/orderer-admin-cert.pem
-
 echo 'NodeOUs:
   Enable: true
   ClientOUIdentifier:
@@ -271,22 +258,16 @@ mv /tmp/hyperledger/org0/orderer/msp/cacerts/* /tmp/hyperledger/org0/orderer/msp
 
 infoln "Create Genesis Block and Channel Transaction"
 
-# mkdir -p /tmp/hyperledger/org0/msp/admincerts
-# cp /tmp/hyperledger/org0/admin/msp/signcerts/cert.pem /tmp/hyperledger/org0/msp/admincerts/admin-org0-cert.pem
 mkdir -p /tmp/hyperledger/org0/msp/cacerts
 cp /tmp/hyperledger/org0/ca/crypto/ca-cert.pem /tmp/hyperledger/org0/msp/cacerts/ca-cert.pem
 mkdir -p /tmp/hyperledger/org0/msp/tlscacerts
 cp /tmp/hyperledger/tls-ca/crypto/ca-cert.pem /tmp/hyperledger/org0/msp/tlscacerts/tls-ca-cert.pem
 
-# mkdir -p /tmp/hyperledger/org1/msp/admincerts
-# cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/msp/admincerts/admin-org1-cert.pem
 mkdir -p /tmp/hyperledger/org1/msp/cacerts
 cp /tmp/hyperledger/org1/ca/crypto/ca-cert.pem /tmp/hyperledger/org1/msp/cacerts/ca-cert.pem
 mkdir -p /tmp/hyperledger/org1/msp/tlscacerts
 cp /tmp/hyperledger/tls-ca/crypto/ca-cert.pem /tmp/hyperledger/org1/msp/tlscacerts/tls-ca-cert.pem
 
-# mkdir -p /tmp/hyperledger/org2/msp/admincerts
-# cp /tmp/hyperledger/org2/admin/msp/signcerts/cert.pem /tmp/hyperledger/org2/msp/admincerts/admin-org2-cert.pem
 mkdir -p /tmp/hyperledger/org2/msp/cacerts
 cp /tmp/hyperledger/org2/ca/crypto/ca-cert.pem /tmp/hyperledger/org2/msp/cacerts/ca-cert.pem
 mkdir -p /tmp/hyperledger/org2/msp/tlscacerts
@@ -305,10 +286,6 @@ docker-compose up -d cli-org1
 
 infoln "Launch Org2’s CLI"
 docker-compose up -d cli-org2
-
-# mkdir -p /tmp/hyperledger/org1/admin/msp/admincerts/
-# cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/admin/msp/admincerts/org1-admin-cert.pem
-
 
 infoln "Create and Join Channel"
 
@@ -331,53 +308,35 @@ docker exec -it cli-org2 sh -c "export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/
 && export CORE_PEER_ADDRESS=peer2-org2:7051 \
 && peer channel join -b /tmp/hyperledger/org2/peer1/assets/mychannel.block"
 
-infoln "Install and Instantiate Chaincode"
+infoln "Install and Approve Chaincode"
 infoln "Org1"
 cp -R ../chaincode /tmp/hyperledger/org1/peer1/assets/
-
-# docker exec -it cli-org1 sh -c "export CORE_PEER_ADDRESS=peer1-org1:7051 \
-# && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp \
-# && peer chaincode install -n mycc -l node -v 1.0 -p /opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode \
-# && export CORE_PEER_ADDRESS=peer2-org1:7051 \
-# && peer chaincode install -n mycc -l node -v 1.0 -p /opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode"
-
-# infoln "Org2 and instantiate chaincode"
-# docker exec -it cli-org2 sh -c "export CORE_PEER_ADDRESS=peer1-org2:7051 \
-# && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp \
-# && peer chaincode install -n mycc -l node -v 1.0 -p /opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode \
-# && export CORE_PEER_ADDRESS=peer2-org2:7051 \
-# && export CORE_PEER_LOCALMSPID=org2MSP  \
-# && peer chaincode install -n mycc -l node -v 1.0 -p /opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode \
-# && peer chaincode instantiate -C mychannel -n mycc -v 1.0 -P 'OR (\"org1MSP.peer\",\"org2MSP.peer\")' -c '{\"Args\":[\"instantiate\"]}' -o orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"
-# peer chaincode instantiate -C mychannel -n mycc -v 1.0 -P "OR ('org1MSP.peer','org2MSP.peer')" -c '{"Args":["init"]}' -o orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
-
-# infoln "Org2 and instantiate chaincode"
-# docker exec -it cli-org2 sh -c "export CORE_PEER_ADDRESS=peer1-org2:7051 \
-# && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp \
-# && export CORE_PEER_ADDRESS=peer2-org2:7051 \
-# && export CORE_PEER_LOCALMSPID=org2MSP  \
-# && peer chaincode instantiate -C mychannel -n mycc -v 1.0 -c '{\"Args\":[\"instantiate\"]}' -o orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"
 
 docker exec -it cli-org1 sh -c "export CORE_PEER_ADDRESS=peer1-org1:7051 \
 && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp \
 && peer lifecycle chaincode package cp.tar.gz --lang node --path /opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode --label cp_0 \
 && peer lifecycle chaincode install cp.tar.gz \
 && export CORE_PEER_ADDRESS=peer2-org1:7051 \
-&& peer lifecycle chaincode install cp.tar.gz
+&& peer lifecycle chaincode install cp.tar.gz \
+&& peer lifecycle chaincode approveformyorg --orderer orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --channelID mychannel --name mycc -v 0 --package-id $PACKAGE_ID --sequence 1
 "
+
+infoln "Install, Approve and Commit Chaincode"
+infoln "Org2"
 
 docker exec -it cli-org2 sh -c "export CORE_PEER_ADDRESS=peer1-org2:7051 \
 && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp \
 && peer lifecycle chaincode package cp.tar.gz --lang node --path /opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode --label cp_0 \
 && peer lifecycle chaincode install cp.tar.gz \
 && export CORE_PEER_ADDRESS=peer2-org2:7051 \
-&& peer lifecycle chaincode install cp.tar.gz
+&& peer lifecycle chaincode install cp.tar.gz \
+&& export PACKAGE_ID=
+&& peer lifecycle chaincode approveformyorg --orderer orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --channelID mychannel --name mycc -v 0 --package-id $PACKAGE_ID --sequence 1
+&& peer lifecycle chaincode commit -o orderer1-org0:7050 --peerAddresses peer1-org2:7051 --tlsRootCertFiles /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --peerAddresses peer2-org2:7051 --tlsRootCertFiles /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --channelID mychannel --name mycc -v 0 --sequence 1 --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --waitForEvent
 "
-# export PACKAGE_ID=
-# peer lifecycle chaincode approveformyorg --orderer orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --channelID mychannel --name mycc -v 0 --package-id $PACKAGE_ID --sequence 1
 
-# docker exec -it cli-org2 sh -c "export CORE_PEER_ADDRESS=peer2-org2:7051 \
-# && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp \
-# && export CORE_PEER_ADDRESS=peer2-org2:7051 \
-# && export CORE_PEER_LOCALMSPID=org2MSP  \
-# && peer chaincode invoke -C mychannel -n mycc -c '{\"Args\":[\"addProduct\",\"x\",\"50.4\",\"kg\", \"\", \"{}\", \"[]\", \"{}\"]}' --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"
+infoln "Test Chaincode from Org1"
+docker exec -it cli-org1 sh -c "peer chaincode invoke -C mychannel -n mycc -c '{\"Args\":[\"addProduct\",\"x\",\"50.4\",\"kg\", \"\", \"{}\", \"[]\", \"{}\"]}' --tls --cafile /tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"
+
+infoln "Test Chaincode from Org2"
+docker exec -it cli-org2 sh -c "peer chaincode invoke -C mychannel -n mycc -c '{\"Args\":[\"addProduct\",\"x\",\"50.4\",\"kg\", \"\", \"{}\", \"[]\", \"{}\"]}' --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"
