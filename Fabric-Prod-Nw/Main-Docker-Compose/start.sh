@@ -9,9 +9,11 @@ function println() {
 C_YELLOW='\033[1;33m'
 C_RESET='\033[0m'
 function infoln() {
+    set +x
     println "${C_YELLOW}*****************************************${C_RESET}"
     println "${C_YELLOW} --------> ${1}${C_RESET}"
     println "${C_YELLOW}*****************************************${C_RESET}"
+    set -x
 }
 
 infoln "Setup TLS CA"
