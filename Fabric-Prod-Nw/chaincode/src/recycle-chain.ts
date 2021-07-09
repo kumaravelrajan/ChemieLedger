@@ -1,6 +1,7 @@
 import { Context, Contract, Info, Transaction } from 'fabric-contract-api';
 import { Location, Product, ProductHistory, ProductMaterial, Trade, Unit } from './models';
 import getUuid = require('uuid-by-string');
+import * as crypto from 'crypto'
 
 @Info({ title: 'RecycleChain', description: 'Smart contract for recycle chain'})
 export class RecycleChainContract extends Contract {
@@ -23,7 +24,8 @@ export class RecycleChainContract extends Contract {
     }
 
     private getIdentity(context: Context): string {
-        return `${context.clientIdentity.getMSPID()}#${context.clientIdentity.getID()}`;
+        const ID = crypto.createHash('md5').update(context.clientIdentity.getID()).digest('hex');
+        return `${context.clientIdentity.getMSPID()}#${ID}`;
     }
 
     private async readStringFromState(context: Context, key: string) {
@@ -56,6 +58,7 @@ export class RecycleChainContract extends Contract {
         _locationOfProduction: string,
         _certificates: string,
         _productMaterial: string): Promise<Product> {
+            context.clientIdentity.getMSPID
 
             const owner = this.getIdentity(context);
             
