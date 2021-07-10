@@ -18,13 +18,16 @@ function infoln() {
     set -x
 }
 
+infoln "Starting base network before adding org3"
+ORG3PATH=$PWD
+cd ../Main-Docker-Compose/
+./start.sh
+cd $ORG3PATH
+infoln "Base network created successfully. Adding org3 to network now.."
+
 # Export path of bin files
 export PATH=${PWD}/../Fabric-bin:$PATH
 infoln "PATH=$PATH"
-
-# Docker compose path
-DCPATH=$PWD
-CHAINCODE_PATH=$DCPATH/../chaincode/
 
 infoln "Setup Org3’s CA"
 docker-compose up -d rca-org3
@@ -44,7 +47,7 @@ mkdir -p /tmp/hyperledger/org3/peer1/assets/ca
 cp /tmp/hyperledger/org3/ca/crypto/ca-cert.pem /tmp/hyperledger/org3/peer1/assets/ca/ca-cert.pem
 
 export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org3/peer1
-export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org3/peer1/assets/ca/org3-ca-cert.pem
+export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org3/peer1/assets/ca/ca-cert.pem
 export FABRIC_CA_CLIENT_MSPDIR=msp
 fabric-ca-client enroll -d -u https://peer1-org3:peer1PW@0.0.0.0:7056
 
@@ -148,5 +151,3 @@ infoln "Test Chaincode from Org3"
 docker exec -it cli-org3 sh -c "export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
 && peer chaincode invoke -C mychannel -n mycc -c '{\"Args\":[\"addProduct\",\"x\",\"36.0\",\"kg\", \"\", \"{}\", \"[]\", \"{}\"]}' --tls --cafile /tmp/hyperledger/org3/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
 "
-
-
