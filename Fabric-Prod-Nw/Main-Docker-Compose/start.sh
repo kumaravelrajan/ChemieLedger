@@ -18,6 +18,9 @@ function infoln() {
     set -x
 }
 
+infoln "Cleaning up previous network (if any) before starting new network"
+./cleanup.sh
+
 infoln "Setup TLS CA"
 infoln "Enroll TLS CA’s Admin"
 docker-compose up -d ca-tls
@@ -25,10 +28,6 @@ docker-compose up -d ca-tls
 # Export path of bin files
 export PATH=${PWD}/../Fabric-bin:$PATH
 infoln "PATH=$PATH"
-
-# Docker compose path
-DCPATH=$PWD
-CHAINCODE_PATH=$DCPATH/../chaincode/
 
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/tls-ca/crypto/ca-cert.pem
 export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/tls-ca/admin
