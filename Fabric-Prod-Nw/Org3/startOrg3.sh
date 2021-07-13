@@ -118,9 +118,20 @@ mv /tmp/hyperledger/org3/peer1/msp/cacerts/* /tmp/hyperledger/org3/peer1/msp/cac
 mv /tmp/hyperledger/org3/peer2/msp/cacerts/* /tmp/hyperledger/org3/peer2/msp/cacerts/ca-cert.pem
 mv /tmp/hyperledger/org3/admin/msp/cacerts/* /tmp/hyperledger/org3/admin/msp/cacerts/ca-cert.pem
 
+# Moving certificates to org3/msp
+mkdir -p /tmp/hyperledger/org3/msp/cacerts
+cp /tmp/hyperledger/org3/ca/crypto/ca-cert.pem /tmp/hyperledger/org3/msp/cacerts/ca-cert.pem
+mkdir -p /tmp/hyperledger/org3/msp/tlscacerts
+cp /tmp/hyperledger/tls-ca/crypto/ca-cert.pem /tmp/hyperledger/org3/msp/tlscacerts/tls-ca-cert.pem
+
 infoln "Launch Org3’s Peers"
 docker-compose up -d peer1-org3
 docker-compose up -d peer2-org3
+
+
+
+infoln "Print org3 org definition"
+configtxgen -printOrg org3 > /tmp/hyperledger/org3/peer1/assets/org3.json
 
 infoln "Fetch existing Channel configuration"
 mkdir -p /tmp/hyperledger/org3/msp/cacerts
@@ -134,25 +145,26 @@ docker exec -it cli-org1 sh -c 'export CORE_PEER_TLS_ENABLED=true \
 && export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem \
 && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp \
 && export CORE_PEER_ADDRESS=peer1-org1:7051 \
-&& peer channel fetch config /tmp/hyperledger/org1/peer1/assets/mychannel-latestconfig.pb -o orderer1-org0:7050 -c mychannel --tls --cafile "/tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"'
+&& peer channel fetch config /tmp/hyperledger/org1/peer1/assets/mychannel.pb -o orderer1-org0:7050 -c mychannel --tls --cafile "/tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"'
 
 infoln "Successfully fetched latest configuration block"
 
 infoln "Converting configuration block to JSON"
 # Requires jq tool https://stedolan.github.io/jq/
+mv /tmp/hyperledger/org1/peer1/assets/mychannel.pb /tmp/hyperledger/org3/peer1/assets/mychannel.pb
 cd /tmp/hyperledger/org3/peer1/assets
-configtxlator proto_decode --input mychannel.block --type common.Block --output mychannel_config_block.json
+configtxlator proto_decode --input mychannel.pb --type common.Block --output mychannel_config_block.json
 jq .data.data[0].payload.data.config mychannel_config_block.json > mychannel_config.json
 
 # Append Org3 config definition to channel's application groups field
 # ToDO locate org3 config and insert below
 # Requires yq https://kislyuk.github.io/yq/ (wrapper of jq tool for yaml files)
-yq -s '.[0] * {"channel_group":{"groups":{"Application":{"groups": {"Org3MSP":.[1]}}}}}' config.json /tmp/hyperledger/org3/msp/config.yaml > modified_config.json
+jq -s '.[0] * {"channel_group":{"groups":{"Application":{"groups": {"org3":.[1]}}}}}' mychannel_config.json /tmp/hyperledger/org3/peer1/assets/org3.json > modified_config.json
 
 infoln "Add new Org Crypto Material"
-configtxlator proto_encode --input config.json --type common.Config --output config.pb
+configtxlator proto_encode --input mychannel_config.json --type common.Config --output mychannel_config.pb
 configtxlator proto_encode --input modified_config.json --type common.Config --output modified_config.pb
-configtxlator compute_update --channel_id mychannel --original config.pb --updated modified_config.pb --output org3_update.pb
+configtxlator compute_update --channel_id mychannel --original mychannel_config.pb --updated modified_config.pb --output org3_update.pb
 configtxlator proto_decode --input org3_update.pb --type common.ConfigUpdate --output org3_update.json
 echo '{"payload":{"header":{"channel_header":{"channel_id":"'mychannel'", "type":2}},"data":{"config_update":'$(cat org3_update.json)'}}}' | jq . > org3_update_in_envelope.json
 configtxlator proto_encode --input org3_update_in_envelope.json --type common.Envelope --output org3_update_in_envelope.pb
@@ -160,46 +172,40 @@ configtxlator proto_encode --input org3_update_in_envelope.json --type common.En
 infoln "Sign and Submit the Config Update"
 infoln "Org1 admin sign..."
 # ToDo may need to adjust path
-peer channel signconfigtx -f org3_update_in_envelope.pb
+cp /tmp/hyperledger/org3/peer1/assets/org3_update_in_envelope.pb /tmp/hyperledger/org1/peer1/assets/org3_update_in_envelope.pb
+docker exec -it cli-org1 sh -c "peer channel signconfigtx -f /tmp/hyperledger/org1/peer1/assets/org3_update_in_envelope.pb"
 
 infoln "Org2 admin sign..."
-# ToDo: set correct FABRIC_CFG_PATH
-export FABRIC_CFG_PATH=${PWD}/../config/
-export CORE_PEER_TLS_ENABLED=true
-# ToDo: Check if LocalMspId is correctly spelled 
-export CORE_PEER_LOCALMSPID="Org2MSP"
-export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org2/peer1/assets/ca/ca-cert.pem
-# Admin Msp
-export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp
-export CORE_PEER_ADDRESS=peer1-org2:7051
+cp /tmp/hyperledger/org1/peer1/assets/org3_update_in_envelope.pb /tmp/hyperledger/org2/peer1/assets/org3_update_in_envelope.pb
 
-peer channel update -f org3_update_in_envelope.pb -c mychannel -o orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org0/orderer/assets/tls-ca/tls-ca-cert.pem
+docker exec -it cli-org2 sh -c 'export CORE_PEER_TLS_ENABLED=true \
+&& export CORE_PEER_LOCALMSPID="org2MSP" \
+&& export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org2/peer1/assets/tls-ca/tls-ca-cert.pem \
+&& export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp \
+&& export CORE_PEER_ADDRESS=peer1-org2:7051 \
+&& peer channel update -f /tmp/hyperledger/org2/peer1/assets/org3_update_in_envelope.pb -c mychannel -o orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org2/peer1/assets/tls-ca/tls-ca-cert.pem'
 
-infoln "Create CLI Container"
+infoln "Channel update of org3 successful."
+
+# Change back to /FabricProdNw/Org3/
+cd $ORG3PATH
+
+infoln "Create org3 CLI Container"
 docker-compose up -d cli-org3
 
 infoln "Org3 Join Channel"
-cp /tmp/hyperledger/org0/orderer/channel.tx /tmp/hyperledger/org3/peer1/assets/channel.tx
+# cp /tmp/hyperledger/org0/orderer/channel.tx /tmp/hyperledger/org3/peer1/assets/channel.tx
 
 infoln "peer1-org3 and peer2-org3 joining channel"
-docker exec -it cli-org3 sh -c "export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
+docker exec -it cli-org3 sh -c 'export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
 && export CORE_PEER_TLS_ENABLED=true \
-&& export CORE_PEER_LOCALMSPID="Org3MSP" \
-&& export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org3/peer1/assets/ca/ca-cert.pem \
+&& export CORE_PEER_LOCALMSPID="org3MSP" \
+&& export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org3/peer1/assets/tls-ca/tls-ca-cert.pem \
 && export CORE_PEER_ADDRESS=peer1-org3:7051 \
-&& peer channel fetch 0 /tmp/hyperledger/org3/peer1/assets/mychannel.block -o orderer1-org0:7050 -c mychannel --tls --cafile /tmp/hyperledger/org0/orderer/assets/tls-ca/tls-ca-cert.pem \
+&& peer channel fetch 0 /tmp/hyperledger/org3/peer1/assets/mychannel.block -o orderer1-org0:7050 -c mychannel --tls --cafile /tmp/hyperledger/org3/peer1/assets/tls-ca/tls-ca-cert.pem \
 && peer channel join -b /tmp/hyperledger/org3/peer1/assets/mychannel.block \
 && export CORE_PEER_ADDRESS=peer2-org3:7051 \
-&& peer channel join -b /tmp/hyperledger/org3/peer1/assets/mychannel.block"
-
-# May beed to set this to enable gossip with new peers
-#CORE_PEER_GOSSIP_USELEADERELECTION=false
-#CORE_PEER_GOSSIP_ORGLEADER=true
-
-# mkdir /tmp/hyperledger/org3/peer1/msp/admincerts
-# cp /tmp/hyperledger/org3/admin/msp/signcerts/cert.pem /tmp/hyperledger/org3/peer1/msp/admincerts/org3-admin-cert.pem
-# TODO exchange cert.pem to Peer 2
-
+&& peer channel join -b /tmp/hyperledger/org3/peer1/assets/mychannel.block'
 
 infoln "Install and Approve Chaincode"
 infoln "Org3"
