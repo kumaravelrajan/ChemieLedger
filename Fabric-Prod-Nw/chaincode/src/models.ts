@@ -49,3 +49,9 @@ export interface ProductHistory {
     /** List of used Materials for that product. */
     productMaterial: [ProductHistory, number][];
 }
+
+export interface LinkProposal {
+    from: string;
+    to: string;
+    validUntil: number;
+}

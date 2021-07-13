@@ -22,6 +22,7 @@ export class StubMock {
     }
 
     public async putState(key: string, value: Buffer) {
-        return this.db[key] = value;
+        this.db[key] = value;
+        return;
     }
 }
