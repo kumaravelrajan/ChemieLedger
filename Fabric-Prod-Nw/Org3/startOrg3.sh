@@ -29,6 +29,12 @@ infoln "Base network created successfully. Adding org3 to network now.."
 export PATH=${PWD}/../Fabric-bin:$PATH
 infoln "PATH=$PATH"
 
+infoln "Registering Org3 peers with TLS CA"
+export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/tls-ca/crypto/ca-cert.pem
+export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/tls-ca/admin
+fabric-ca-client register -d --id.name peer1-org3 --id.secret peer1PW --id.type peer -u https://0.0.0.0:7052
+fabric-ca-client register -d --id.name peer2-org3 --id.secret peer2PW --id.type peer -u https://0.0.0.0:7052
+
 infoln "Setup Org3’s CA"
 docker-compose up -d rca-org3
 
@@ -42,7 +48,7 @@ fabric-ca-client register -d --id.name admin-org3 --id.secret org3AdminPW --id.t
 fabric-ca-client register -d --id.name user-org3 --id.secret org3UserPW --id.type user -u https://0.0.0.0:7056
 
 infoln "Setup Org3’s Peers"
-infoln "Enroll Peer1"
+# Enroll Peer1 against Org3 CA
 mkdir -p /tmp/hyperledger/org3/peer1/assets/ca
 cp /tmp/hyperledger/org3/ca/crypto/ca-cert.pem /tmp/hyperledger/org3/peer1/assets/ca/ca-cert.pem
 
@@ -65,6 +71,7 @@ infoln "Enroll Peer2"
 mkdir -p /tmp/hyperledger/org3/peer2/assets/ca
 cp /tmp/hyperledger/org3/ca/crypto/ca-cert.pem /tmp/hyperledger/org3/peer2/assets/ca/ca-cert.pem
 
+# Enroll peer2 against org3 CA
 export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org3/peer2
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org3/peer2/assets/ca/ca-cert.pem
 export FABRIC_CA_CLIENT_MSPDIR=msp
@@ -81,7 +88,7 @@ fabric-ca-client enroll -d -u https://peer2-org3:peer2PW@0.0.0.0:7052 --enrollme
 #Change name of key to key.pem
 mv /tmp/hyperledger/org3/peer2/tls-msp/keystore/* /tmp/hyperledger/org3/peer2/tls-msp/keystore/key.pem
 
-ifnoln "Enroll Org3's Admin"
+infoln "Enroll Org3's Admin"
 export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org3/admin
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org3/peer1/assets/ca/ca-cert.pem
 export FABRIC_CA_CLIENT_MSPDIR=msp
@@ -121,18 +128,13 @@ cp /tmp/hyperledger/org3/ca/crypto/ca-cert.pem /tmp/hyperledger/org3/msp/cacerts
 mkdir -p /tmp/hyperledger/org3/msp/tlscacerts
 cp /tmp/hyperledger/tls-ca/crypto/ca-cert.pem /tmp/hyperledger/org3/msp/tlscacerts/tls-ca-cert.pem
 
-infoln "Operating as Org1 admin"
-# ToDo: set correct FABRIC_CFG_PATH
-export FABRIC_CFG_PATH=${PWD}/../config/
-export CORE_PEER_TLS_ENABLED=true
-# ToDo: Check if LocalMspId is correctly spelled 
-export CORE_PEER_LOCALMSPID="Org1MSP"
-export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org1/peer1/assets/ca/ca-cert.pem
-# Admin Msp
-export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp
-export CORE_PEER_ADDRESS=peer1-org1:7051
-
-peer channel fetch config /tmp/hyperledger/org3/peer1/assets/mychannel.block -o orderer1-org0:7050 --ordererTLSHostnameOverride orderer1-org0 -c mychannel --tls --cafile "/tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"
+infoln "Operating as Org1 admin from cli-org1"
+docker exec -it cli-org1 sh -c 'export CORE_PEER_TLS_ENABLED=true \
+&& export CORE_PEER_LOCALMSPID="org1MSP" \
+&& export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem \
+&& export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp \
+&& export CORE_PEER_ADDRESS=peer1-org1:7051 \
+&& peer channel fetch config /tmp/hyperledger/org1/peer1/assets/mychannel-latestconfig.pb -o orderer1-org0:7050 -c mychannel --tls --cafile "/tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"'
 
 infoln "Successfully fetched latest configuration block"
 
@@ -171,7 +173,7 @@ export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org2/peer1/assets/ca/ca-cert
 export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp
 export CORE_PEER_ADDRESS=peer1-org2:7051
 
-peer channel update -f org3_update_in_envelope.pb -c mychannel -o orderer1-org0:7050 --ordererTLSHostnameOverride orderer1-org0 --tls --cafile /tmp/hyperledger/org0/orderer/assets/tls-ca/tls-ca-cert.pem
+peer channel update -f org3_update_in_envelope.pb -c mychannel -o orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org0/orderer/assets/tls-ca/tls-ca-cert.pem
 
 infoln "Create CLI Container"
 docker-compose up -d cli-org3
@@ -185,7 +187,7 @@ docker exec -it cli-org3 sh -c "export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/
 && export CORE_PEER_LOCALMSPID="Org3MSP" \
 && export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org3/peer1/assets/ca/ca-cert.pem \
 && export CORE_PEER_ADDRESS=peer1-org3:7051 \
-&& peer channel fetch 0 /tmp/hyperledger/org3/peer1/assets/mychannel.block -o orderer1-org0:7050 --ordererTLSHostnameOverride orderer1-org0 -c mychannel --tls --cafile /tmp/hyperledger/org0/orderer/assets/tls-ca/tls-ca-cert.pem \
+&& peer channel fetch 0 /tmp/hyperledger/org3/peer1/assets/mychannel.block -o orderer1-org0:7050 -c mychannel --tls --cafile /tmp/hyperledger/org0/orderer/assets/tls-ca/tls-ca-cert.pem \
 && peer channel join -b /tmp/hyperledger/org3/peer1/assets/mychannel.block \
 && export CORE_PEER_ADDRESS=peer2-org3:7051 \
 && peer channel join -b /tmp/hyperledger/org3/peer1/assets/mychannel.block"
