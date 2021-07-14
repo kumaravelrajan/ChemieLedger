@@ -7,6 +7,7 @@ import helmet from 'helmet'
 import dotenv from 'dotenv'
 import routes from './routes'
 import { connectDB } from './models'
+import { setup } from './fabric/fabric.service'
 
 // ----------------------
 // env variables
@@ -96,6 +97,10 @@ app.use((err, req, res, next) => {
     }
   })
 })
+
+// Setup fabric
+setup()
+
 
 // start the server
 var server = app.listen(port, () => {
