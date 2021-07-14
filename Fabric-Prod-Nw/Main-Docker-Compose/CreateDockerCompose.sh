@@ -1,3 +1,6 @@
+#!/bin/bash
+. ./env.sh
+cat <<EOT >> docker-compose.yml
 version: '2'
 
 networks:
@@ -272,3 +275,4 @@ services:
          - /tmp/hyperledger/org2/admin:/tmp/hyperledger/org2/admin
       networks:
          - fabric-ca
+EOT

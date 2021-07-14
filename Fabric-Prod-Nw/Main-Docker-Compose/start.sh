@@ -21,6 +21,9 @@ function infoln() {
 infoln "Cleaning up previous network (if any) before starting new network"
 ./cleanup.sh
 
+infoln "Create custom docker-compose file"
+. ./CreateDockerCompose.sh
+
 infoln "Setup TLS CA"
 infoln "Enroll TLS CA’s Admin"
 docker-compose up -d ca-tls
