@@ -2,7 +2,7 @@ import { Context, Contract, Info, Transaction } from 'fabric-contract-api';
 import { LinkProposal, Location, Product, ProductHistory, ProductMaterial, Trade, Unit } from './models';
 import getUuid = require('uuid-by-string');
 import * as crypto from 'crypto'
-import { RecycleChainV1 } from './recycle-chain.interface';
+import { RecycleChainV1 } from './recycle-chainV1.model';
 
 @Info({ title: 'RecycleChain', description: 'Smart contract for recycle chain'})
 export class RecycleChainContract extends Contract implements RecycleChainV1 {
@@ -111,14 +111,15 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
     }
 
     @Transaction()
-    public async deleteProduct(context: Context, productID: string): Promise<Product> {
-        const product: Product = await this.readObjectFromState(context, productID) as Product;
-        if (!this.isProduct(product)) {
+    public async deleteRemainingSource(context: Context, sourceID: string): Promise<Product | Trade> {
+        const source: Product | Trade = await this.readObjectFromState(context, sourceID);
+        if (!this.isProduct(source) || this.isTrade(source)) {
             throw new Error('The provided ID does not refer to a product!')
         }
-        product.availableAmount = 0;
-        await this.writeToState(context, product.ID, product);
-        return product;
+        source.availableAmount = 0;
+        await this.writeToState(context, source.ID, source);
+        return source;
+        
     }
 
     @Transaction()
@@ -256,6 +257,9 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
 
     private isProduct(source: Product | Trade): source is Product {
         return ('producer' in source);
+    }
+    private isTrade(source: Product | Trade): source is Trade {
+        return ('buyer' in source);
     }
 
 }

@@ -37,14 +37,14 @@ export interface RecycleChainV1 {
      */
     getProduct(context: Context, productID: string): Promise<Product>;
     /**
-     * Sets the available amount of this product to zero.
+     * Sets the available amount of this source to zero.
      * @param {Context} context (Automatically generated) The transaction context
-     * @param {string} productID the unique ID of the product
-     * @returns {Product} product with the given ID.
+     * @param {string} sourceID the unique ID of the source
+     * @returns {Product | Trade} product or trade with the given ID.
      */
-    deleteProduct(context: Context, productID: string): Promise<Product>;
+     deleteRemainingSource(context: Context, sourceID: string): Promise<Product | Trade>;
     /**
-     * Register a trade of the specified product from the caller to the seller. If the transferred amount will be subtracted from the available amount of the product.
+     * Register a trade of the specified source from the caller to the seller. If the transferred amount will be subtracted from the available amount of the source.
      * @param {Context} context (Automatically generated) The transaction context
      * @param {string} sourceID the unique ID of the product or trade
      * @param {string} buyer The unique user ID of the buyer
@@ -53,7 +53,7 @@ export interface RecycleChainV1 {
     */
     addTrade(context: Context, sourceID: string, buyer: string, amountTransferred: number): Promise<Trade>
     /**
-     * Query the upstream history and the material of the product with the given ID
+     * Query the upstream history and the material of the source with the given ID
      * @param {Context} context (Automatically generated) The transaction context 
      * @param {string} sourceID the unique ID of the source
      * @returns {ProductHistory} A nested map of Products and the used amounts
