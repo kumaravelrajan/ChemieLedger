@@ -1,18 +1,20 @@
 # Overview of blockchain network - 
-The blockchain network can be setup using the given scripts at Fabric-Prod-Nw/Main-Docker-Compose/start.sh and Fabric-Prod-Nw/Org3/startOrg3.sh. We recognize the need for a consortium blockchain network to be flexible as new organizations may always want to join the consortium. For this purpose, we have the following types of blockchain deployments possible - 
+The blockchain network can be setup using the given scripts in this repo. We recognize the need for a consortium blockchain network to be flexible as new organizations may always want to join the consortium. For this purpose, we have the following types of blockchain network deployments possible - 
 
 1. **Base network**
 1. **Additional organization (Org3) in base network**
 
 # Base network: 
-  - **Participants**:
-    - Peer orgnizations = 2 (org1 and org2)
-    - Orderer organizations = 1 (org0)
-  - Tool used for certificate generation: Fabric CA
-    - Each organization (peer and orderer orgs) has its own organization CA
-    - All organizations share the same TLS CA server. The TLS CA is used to encrypt communication between the fabric network nodes.
+- **Startup script:** Fabric-Prod-Nw/Main-Docker-Compose/start.sh
+- **Participants**:
+  - Peer orgnizations = 2 (org1 and org2)
+  - Orderer organizations = 1 (org0)
+- Tool used for certificate generation: Fabric CA
+  - Each organization (peer and orderer orgs) has its own organization CA
+  - All organizations share the same TLS CA server. The TLS CA is used to encrypt communication between the fabric network nodes.
 
 # Additional organization (Org3) in base network:
+- **Startup script:** Fabric-Prod-Nw/Org3/startOrg3.sh
 - **Participants**:
   - Peer orgnizations = 3 (org1, org2, org3)
   - Orderer organizations = 1 (org0)
