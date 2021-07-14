@@ -301,17 +301,15 @@ cp /tmp/hyperledger/org0/orderer/channel.tx /tmp/hyperledger/org1/peer1/assets/c
 cp /tmp/hyperledger/org0/orderer/channel.tx /tmp/hyperledger/org2/peer1/assets/channel.tx
 
 infoln "peer1-org1 Creating channel and peer1-org1 and peer2-org1 joining channel"
-docker exec -it cli-org1 sh -c "export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp \
-&& peer channel create -c mychannel -f /tmp/hyperledger/org1/peer1/assets/channel.tx -o orderer1-org0:7050 --outputBlock /tmp/hyperledger/org1/peer1/assets/mychannel.block --tls --cafile /tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem \
+docker exec -it cli-org1 sh -c "peer channel create -c mychannel -f /tmp/hyperledger/org1/peer1/assets/channel.tx -o orderer1-org0:7050 --outputBlock /tmp/hyperledger/org1/peer1/assets/mychannel.block --tls --cafile /tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem \
 && export CORE_PEER_ADDRESS=peer1-org1:7051 \
 && peer channel join -b /tmp/hyperledger/org1/peer1/assets/mychannel.block \
-&& export CORE_PEER_ADDRESS=peer2-org1:7051 \
+&& export CORE_PEER_ADDRESS=peer2-org1:9051 \
 && peer channel join -b /tmp/hyperledger/org1/peer1/assets/mychannel.block"
 
 infoln "peer1-org2 and peer2-org2 joining channel"
 cp /tmp/hyperledger/org1/peer1/assets/mychannel.block /tmp/hyperledger/org2/peer1/assets/mychannel.block
-docker exec -it cli-org2 sh -c "export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp \
-&& export CORE_PEER_ADDRESS=peer1-org2:7051 \
+docker exec -it cli-org2 sh -c "export CORE_PEER_ADDRESS=peer1-org2:7051 \
 && peer channel join -b /tmp/hyperledger/org2/peer1/assets/mychannel.block \
 && export CORE_PEER_ADDRESS=peer2-org2:7051 \
 && peer channel join -b /tmp/hyperledger/org2/peer1/assets/mychannel.block"
@@ -321,17 +319,15 @@ infoln "Org1"
 rsync -a --exclude=node_modules/ ../chaincode /tmp/hyperledger/org1/peer1/assets/
 
 docker exec -it cli-org1 sh -c "export CORE_PEER_ADDRESS=peer1-org1:7051 \
-&& export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp \
 && peer lifecycle chaincode package cp.tar.gz --lang node --path /opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode --label cp_0 \
 && peer lifecycle chaincode install cp.tar.gz \
-&& export CORE_PEER_ADDRESS=peer2-org1:7051 \
+&& export CORE_PEER_ADDRESS=peer2-org1:9051 \
 && peer lifecycle chaincode install cp.tar.gz
 "
 
 sleep 5
 
-docker exec -it cli-org3 sh -c 'export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
-&& export PACKAGE_ID=$(peer lifecycle chaincode queryinstalled | grep Package | sed -e "s/.*Package ID: \(.*\), Label:.*/\1/") \
+docker exec -it cli-org1 sh -c 'export PACKAGE_ID=$(peer lifecycle chaincode queryinstalled | grep Package | sed -e "s/.*Package ID: \(.*\), Label:.*/\1/") \
 && peer lifecycle chaincode approveformyorg --orderer orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --channelID mychannel --name mycc -v 0 --package-id $PACKAGE_ID --sequence 1
 '
 
@@ -339,7 +335,6 @@ infoln "Install, Approve and Commit Chaincode"
 infoln "Org2"
 
 docker exec -it cli-org2 sh -c "export CORE_PEER_ADDRESS=peer1-org2:7051 \
-&& export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp \
 && peer lifecycle chaincode package cp.tar.gz --lang node --path /opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode --label cp_0 \
 && peer lifecycle chaincode install cp.tar.gz \
 && export CORE_PEER_ADDRESS=peer2-org2:7051 \
@@ -348,17 +343,18 @@ docker exec -it cli-org2 sh -c "export CORE_PEER_ADDRESS=peer1-org2:7051 \
 
 sleep 5
 
-docker exec -it cli-org3 sh -c 'export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
-&& export PACKAGE_ID=$(peer lifecycle chaincode queryinstalled | grep Package | sed -e "s/.*Package ID: \(.*\), Label:.*/\1/") \
+docker exec -it cli-org2 sh -c 'export PACKAGE_ID=$(peer lifecycle chaincode queryinstalled | grep Package | sed -e "s/.*Package ID: \(.*\), Label:.*/\1/") \
 && peer lifecycle chaincode approveformyorg --orderer orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --channelID mychannel --name mycc -v 0 --package-id $PACKAGE_ID --sequence 1 \
 && peer lifecycle chaincode commit -o orderer1-org0:7050 --peerAddresses peer1-org2:7051 --tlsRootCertFiles /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --peerAddresses peer2-org2:7051 --tlsRootCertFiles /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --channelID mychannel --name mycc -v 0 --sequence 1 --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --waitForEvent
 '
 
 infoln "Test Chaincode from Org1"
-docker exec -it cli-org1 sh -c "export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp \
-&& peer chaincode invoke -C mychannel -n mycc -c '{\"Args\":[\"addProduct\",\"x\",\"50.4\",\"kg\", \"\", \"{}\", \"[]\", \"{}\"]}' --tls --cafile /tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
+docker exec -it cli-org1 sh -c "peer chaincode invoke -C mychannel -n mycc -c '{\"Args\":[\"addProduct\",\"x\",\"50.4\",\"kg\", \"\", \"{}\", \"[]\", \"{}\"]}' --tls --cafile /tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
 "
 
 infoln "Test Chaincode from Org2"
 docker exec -it cli-org2 sh -c "peer chaincode invoke -C mychannel -n mycc -c '{\"Args\":[\"addProduct\",\"x\",\"50.4\",\"kg\", \"\", \"{}\", \"[]\", \"{}\"]}' --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
 "
+
+echo "`awk 'NF {sub(/\\n/, ""); printf "%s\\\\n",$0;}' /tmp/hyperledger/org1/msp/tlscacerts/tls-ca-cert.pem`" > tls-ca-cert.pem
+echo "`awk 'NF {sub(/\\n/, ""); printf "%s\\\\n",$0;}' /tmp/hyperledger/org1/msp/cacerts/ca-cert.pem`" > ca-cert.pem
