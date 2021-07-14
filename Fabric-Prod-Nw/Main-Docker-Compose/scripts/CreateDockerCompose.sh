@@ -1,6 +1,6 @@
 #!/bin/bash
-. ./env.sh
-cat <<EOT >> docker-compose.yml
+. ./scripts/env.sh
+cat <<EOT >> ./docker-compose.yml
 version: '2'
 
 networks:
@@ -84,10 +84,10 @@ services:
       image: hyperledger/fabric-peer:2.3
       environment:
          - CORE_PEER_ID=peer1-org1
-         - CORE_PEER_ADDRESS=peer1-org1:7051
-         - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-         - CORE_PEER_CHAINCODEADDRESS=peer1-org1:7052
-         - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+         - CORE_PEER_ADDRESS=peer1-org1:$PEER1_ORG1_PORT
+         - CORE_PEER_LISTENADDRESS=0.0.0.0:$PEER1_ORG1_PORT
+         - CORE_PEER_CHAINCODEADDRESS=peer1-org1:$((PEER1_ORG1_PORT+1))
+         - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:$((PEER1_ORG1_PORT+1))
          - CORE_PEER_LOCALMSPID=org1MSP
          - CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/peer1/msp
          - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -99,7 +99,7 @@ services:
          - CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
          - CORE_PEER_GOSSIP_USELEADERELECTION=true
          - CORE_PEER_GOSSIP_ORGLEADER=false
-         - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1-org1:7051
+         - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1-org1:$PEER1_ORG1_PORT
          - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
       working_dir: /opt/gopath/src/github.com/hyperledger/fabric/org1/peer1
       volumes:
@@ -108,17 +108,17 @@ services:
       networks:
          - fabric-ca
       ports:
-         - 7051:7051
+         - $PEER1_ORG1_PORT:$PEER1_ORG1_PORT
 
    peer2-org1:
       container_name: peer2-org1
       image: hyperledger/fabric-peer:2.3
       environment:
          - CORE_PEER_ID=peer2-org1
-         - CORE_PEER_ADDRESS=peer2-org1:9051
-         - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
-         - CORE_PEER_CHAINCODEADDRESS=peer2-org1:9052
-         - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
+         - CORE_PEER_ADDRESS=peer2-org1:$PEER2_ORG1_PORT
+         - CORE_PEER_LISTENADDRESS=0.0.0.0:$PEER2_ORG1_PORT
+         - CORE_PEER_CHAINCODEADDRESS=peer2-org1:$((PEER2_ORG1_PORT+1))
+         - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:$((PEER2_ORG1_PORT+1))
          - CORE_PEER_LOCALMSPID=org1MSP
          - CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/peer2/msp
          - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -130,9 +130,9 @@ services:
          - CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org1/peer2/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
          - CORE_PEER_GOSSIP_USELEADERELECTION=true
          - CORE_PEER_GOSSIP_ORGLEADER=false
-         - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer2-org1:9051
+         - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer2-org1:$PEER2_ORG1_PORT
          - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
-         - CORE_PEER_GOSSIP_BOOTSTRAP=peer1-org1:9051
+         - CORE_PEER_GOSSIP_BOOTSTRAP=peer1-org1:$PEER1_ORG1_PORT
       working_dir: /opt/gopath/src/github.com/hyperledger/fabric/org1/peer2
       volumes:
          - /var/run:/host/var/run
@@ -140,17 +140,17 @@ services:
       networks:
          - fabric-ca
       ports:
-         - 9051:9051
+         - $PEER2_ORG1_PORT:$PEER2_ORG1_PORT
 
    peer1-org2:
       container_name: peer1-org2
       image: hyperledger/fabric-peer:2.3
       environment:
          - CORE_PEER_ID=peer1-org2
-         - CORE_PEER_ADDRESS=peer1-org2:7051
-         - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-         - CORE_PEER_CHAINCODEADDRESS=peer1-org2:7052
-         - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+         - CORE_PEER_ADDRESS=peer1-org2:$PEER1_ORG2_PORT
+         - CORE_PEER_LISTENADDRESS=0.0.0.0:$PEER1_ORG2_PORT
+         - CORE_PEER_CHAINCODEADDRESS=peer1-org2:$((PEER1_ORG2_PORT+1))
+         - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:$((PEER1_ORG2_PORT+1))
          - CORE_PEER_LOCALMSPID=org2MSP
          - CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/peer1/msp
          - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -162,7 +162,7 @@ services:
          - CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
          - CORE_PEER_GOSSIP_USELEADERELECTION=true
          - CORE_PEER_GOSSIP_ORGLEADER=false
-         - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1-org2:7051
+         - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1-org2:$PEER1_ORG2_PORT
          - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
       working_dir: /opt/gopath/src/github.com/hyperledger/fabric/org2/peer1
       volumes:
@@ -170,18 +170,18 @@ services:
          - /tmp/hyperledger/org2/peer1:/tmp/hyperledger/org2/peer1
       networks:
          - fabric-ca
-      # ports:
-      #    - 7051:7051
+      ports:
+         - $PEER1_ORG2_PORT:$PEER1_ORG2_PORT
 
    peer2-org2:
       container_name: peer2-org2
       image: hyperledger/fabric-peer:2.3
       environment:
          - CORE_PEER_ID=peer2-org2
-         - CORE_PEER_ADDRESS=peer2-org2:7051
-         - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-         - CORE_PEER_CHAINCODEADDRESS=peer2-org2:7052
-         - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+         - CORE_PEER_ADDRESS=peer2-org2:$PEER2_ORG2_PORT
+         - CORE_PEER_LISTENADDRESS=0.0.0.0:$PEER2_ORG2_PORT
+         - CORE_PEER_CHAINCODEADDRESS=peer2-org2:$((PEER2_ORG2_PORT+1))
+         - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:$((PEER2_ORG2_PORT+1))
          - CORE_PEER_LOCALMSPID=org2MSP
          - CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/peer2/msp
          - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -193,17 +193,17 @@ services:
          - CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org2/peer2/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
          - CORE_PEER_GOSSIP_USELEADERELECTION=true
          - CORE_PEER_GOSSIP_ORGLEADER=false
-         - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer2-org2:7051
+         - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer2-org2:$PEER2_ORG2_PORT
          - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
-         - CORE_PEER_GOSSIP_BOOTSTRAP=peer1-org2:7051
+         - CORE_PEER_GOSSIP_BOOTSTRAP=peer1-org2:$PEER1_ORG2_PORT
       working_dir: /opt/gopath/src/github.com/hyperledger/fabric/org2/peer2
       volumes:
          - /var/run:/host/var/run
          - /tmp/hyperledger/org2/peer2:/tmp/hyperledger/org2/peer2
       networks:
          - fabric-ca
-      # ports:
-      #    - 7051:7051
+      ports:
+         - $PEER2_ORG2_PORT:$PEER2_ORG2_PORT
 
    orderer1-org0:
       container_name: orderer1-org0
@@ -212,7 +212,7 @@ services:
          - ORDERER_HOME=/tmp/hyperledger/orderer
          - ORDERER_HOST=orderer1-org0
          - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
-         - ORDERER_GENERAL_LISTENPORT=7050
+         - ORDERER_GENERAL_LISTENPORT=$ORDERER1_ORG0_PORT
          - ORDERER_GENERAL_GENESISMETHOD=file
          - ORDERER_GENERAL_GENESISFILE=/tmp/hyperledger/org0/orderer/genesis.block
          - ORDERER_GENERAL_LOCALMSPID=org0MSP
@@ -228,7 +228,7 @@ services:
       networks:
          - fabric-ca
       ports:
-         - 7050:7050
+         - $ORDERER1_ORG0_PORT:$ORDERER1_ORG0_PORT
 
    cli-org1:
       container_name: cli-org1
@@ -239,7 +239,7 @@ services:
          - GOPATH=/opt/gopath
          - FABRIC_LOGGING_SPEC=DEBUG
          - CORE_PEER_ID=cli
-         - CORE_PEER_ADDRESS=peer1-org1:7051
+         - CORE_PEER_ADDRESS=peer1-org1:$PEER1_ORG1_PORT
          - CORE_PEER_LOCALMSPID=org1MSP
          - CORE_PEER_TLS_ENABLED=true
          - CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
@@ -262,7 +262,7 @@ services:
          - GOPATH=/opt/gopath
          - FABRIC_LOGGING_SPEC=DEBUG
          - CORE_PEER_ID=cli
-         - CORE_PEER_ADDRESS=peer1-org2:7051
+         - CORE_PEER_ADDRESS=peer1-org2:$PEER1_ORG2_PORT
          - CORE_PEER_LOCALMSPID=org2MSP
          - CORE_PEER_TLS_ENABLED=true
          - CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
