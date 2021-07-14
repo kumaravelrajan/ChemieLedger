@@ -19,6 +19,14 @@ const userSchema = new Schema(
     name: String,
     surname: String,
     password: String,
+    x509Identity: {
+      type: String,
+      default: null
+    },
+    x509IdentityIV: {
+      type: String,
+      default: null
+    },
     origin: {
       type: Schema.Types.ObjectId,
       ref: 'Origin',
@@ -71,7 +79,7 @@ userSchema.methods.comparePassword = function (candidatePassword, cb) {
 userSchema.options.toJSON = {
   transform: dbHideTransformation,
   virtuals: false,
-  alwaysHide: '__v password',
+  alwaysHide: '__v password x509Identity x509IdentityIV',
   hide: 'createdAt updatedAt'
 }
 

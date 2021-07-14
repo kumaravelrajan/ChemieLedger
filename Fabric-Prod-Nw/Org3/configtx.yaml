@@ -1,0 +1,43 @@
+################################################################################
+#
+#   Section: Organizations
+#
+#   - This section defines the different organizational identities which will
+#   be referenced later in the configuration.
+#
+################################################################################
+
+Organizations:
+- &org3
+
+  Name: org3
+
+  # ID to load the MSP definition as
+  ID: org3MSP
+
+  # MSPDir is the filesystem path which contains the MSP configuration
+  MSPDir: /tmp/hyperledger/org3/msp
+
+  AnchorPeers:
+    # AnchorPeers defines the location of peers which can be used
+    # for cross org gossip communication.  Note, this value is only
+    # encoded in the genesis block in the Application section context
+    - Host: peer1-org3
+      Port: 7051
+
+  # Policies defines the set of policies at this level of the config tree
+  # For organization policies, their canonical path is usually
+  #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+  Policies:
+      Readers:
+          Type: Signature
+          Rule: "OR('org3MSP.admin', 'org3MSP.peer', 'org3MSP.client', 'org3MSP.member')"
+      Writers:
+          Type: Signature
+          Rule: "OR('org3MSP.admin', 'org3MSP.client', 'org3MSP.member')"
+      Admins:
+          Type: Signature
+          Rule: "OR('org3MSP.admin')"
+      Endorsement:
+          Type: Signature
+          Rule: "OR('org3MSP.peer', 'org3MSP.admin')"

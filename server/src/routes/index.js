@@ -10,6 +10,7 @@ import communication from './communication'
 import notification from './notification'
 import pricehistory from './pricehistory'
 import video from './video'
+import fabric from './fabric'
 
 const router = express.Router()
 router.use('/auth', cors({ methods: 'POST, PATCH' }), authentication)
@@ -26,5 +27,6 @@ router.use('/communication', cors({ methods: 'GET, POST' }), communication)
 router.use('/notification', cors({ methods: 'GET' }), notification)
 router.use('/pricehistory', cors({ mothods: 'GET' }), pricehistory)
 router.use('/video', cors({ mothods: 'GET' }), video)
+router.use('/fabric', cors({ mothods: 'GET, POST' }), fabric)
 
 module.exports = router
