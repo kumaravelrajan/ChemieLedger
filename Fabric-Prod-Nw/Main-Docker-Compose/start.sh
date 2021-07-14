@@ -27,7 +27,6 @@ docker-compose up -d ca-tls
 
 # Export path of bin files
 export PATH=${PWD}/../Fabric-bin:$PATH
-infoln "PATH=$PATH"
 
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/tls-ca/crypto/ca-cert.pem
 export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/tls-ca/admin

@@ -27,7 +27,6 @@ infoln "Base network created successfully. Adding org3 to network now.."
 
 # Export path of bin files
 export PATH=${PWD}/../Fabric-bin:$PATH
-infoln "PATH=$PATH"
 
 infoln "Registering Org3 peers with TLS CA"
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/tls-ca/crypto/ca-cert.pem
@@ -44,7 +43,7 @@ export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org3/ca/admin
 fabric-ca-client enroll -d -u https://rca-org3-admin:rca-org3-adminpw@0.0.0.0:7056
 fabric-ca-client register -d --id.name peer1-org3 --id.secret peer1PW --id.type peer -u https://0.0.0.0:7056
 fabric-ca-client register -d --id.name peer2-org3 --id.secret peer2PW --id.type peer -u https://0.0.0.0:7056
-fabric-ca-client register -d --id.name admin-org3 --id.secret org3AdminPW --id.type user -u https://0.0.0.0:7056
+fabric-ca-client register -d --id.name admin-org3 --id.secret org3AdminPW --id.type admin -u https://0.0.0.0:7056
 fabric-ca-client register -d --id.name user-org3 --id.secret org3UserPW --id.type user -u https://0.0.0.0:7056
 
 infoln "Setup Org3’s Peers"
