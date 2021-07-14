@@ -228,7 +228,7 @@ docker exec -it cli-org3 sh -c "export CORE_PEER_ADDRESS=peer1-org3:$PEER1_ORG3_
 && peer lifecycle chaincode install cp.tar.gz \
 "
 
-sleep 5
+sleep 10
 
 docker exec -it cli-org3 sh -c 'export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
 && export PACKAGE_ID=$(peer lifecycle chaincode queryinstalled | grep Package | sed -e "s/.*Package ID: \(.*\), Label:.*/\1/") \
