@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config()
 import  { Gateway } from 'fabric-network'
-import { ccp, wallet, enrollUser } from './fabric.service'
+import { ccp, wallet, enrollUser, decryptX509Identity } from './fabric.service'
 const CHANNEL_NAME = process.env.CHANNEL_NAME
 const CHAINCODE_ID = process.env.CHAINCODE_ID
 let gateway

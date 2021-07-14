@@ -21,6 +21,7 @@ const algorithm = 'aes-256-ctr';
 export let ccp;
 export let caClient;
 export let wallet;
+let adminUser;
 
 export async function setup () {
 	// build an in memory object with the network configuration (also known as a connection profile)
@@ -120,14 +121,15 @@ export async function enrollUser(user) {
 	}
 
 	// Must use an admin to register a new user
-	const adminIdentity = await wallet.get(caAdminUserId);
-	if (!adminIdentity) {
-		enrollAdmin()
+	if (!adminUser) {
+		const adminIdentity = await wallet.get(caAdminUserId);
+		if (!adminIdentity) {
+			enrollAdmin()
+		}
+		// build a user object for authenticating with the CA
+		const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type);
+		adminUser = await provider.getUserContext(adminIdentity, caAdminUserId);
 	}
-
-	// build a user object for authenticating with the CA
-	const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type);
-	const adminUser = await provider.getUserContext(adminIdentity, caAdminUserId);
 
 	// Register the user
 	const enrollmentSecret = await caClient.register({
@@ -153,7 +155,7 @@ export async function enrollUser(user) {
 	const encryptedIdentity = encryptX509Identity(x509Identity);
 	user.x509Identity = encryptedIdentity.content
 	user.x509IdentityIV = encryptedIdentity.iv
-	console.log('Successfully stored encrypted wallet in database')
+	console.log('Successfully stored encrypted x509Identity in database')
 	return user;
 }
 
@@ -168,7 +170,7 @@ function encryptX509Identity(x509Identity) {
     };
 }
 
-function decryptX509Identity(user) {
+export function decryptX509Identity(user) {
 	const decipher = crypto.createDecipheriv(algorithm, process.env.WALLET_MASTER_KEY, Buffer.from(user.x509IdentityIV, 'hex'))
     const decrpyted = Buffer.concat([decipher.update(Buffer.from(user.x509Identity, 'hex')), decipher.final()])
     const x509Identity = JSON.parse(decrpyted.toString())

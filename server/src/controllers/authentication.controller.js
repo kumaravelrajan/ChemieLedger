@@ -11,6 +11,7 @@ import {
   generateTokenValidForMinutes
 } from '../services/token.service'
 import { sendResetEmail, sendVerifactionEmail } from '../services/email.service'
+import { enrollUser } from '../fabric/fabric.service'
 
 const login = async (req, res) => {
   const userJson = await getUserJSON(req.user)
@@ -111,6 +112,7 @@ const verifyEmail = async (req, res, next) => {
   await updateUser(user)
   const updatedUser = await getUserJSON(user)
   updatedUser['access_token'] = generateToken(updatedUser._id)
+  await enrollUser(user)
   res.json(updatedUser)
 }
 
