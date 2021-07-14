@@ -25,6 +25,16 @@ cd ../Base-Network/
 cd $ORG3PATH
 infoln "Base network created successfully. Adding org3 to network now.."
 
+infoln "Removing Org3 docker compose and configtx.yaml file if present"
+./cleanup.sh
+
+infoln "Create custom docker-compose file"
+. ../env.sh
+. ./scripts/CreateDockerCompose.sh
+
+infoln "Create custom configtx.yml file"
+. ./scripts/CreateConfigTx.sh
+
 # Export path of bin files
 export PATH=${PWD}/../Fabric-bin:$PATH
 
@@ -144,7 +154,7 @@ docker exec -it cli-org1 sh -c 'export CORE_PEER_TLS_ENABLED=true \
 && export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem \
 && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp \
 && export CORE_PEER_ADDRESS=peer1-org1:7051 \
-&& peer channel fetch config /tmp/hyperledger/org1/peer1/assets/mychannel.pb -o orderer1-org0:7050 -c mychannel --tls --cafile "/tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"'
+&& peer channel fetch config /tmp/hyperledger/org1/peer1/assets/mychannel.pb -o orderer1-org0:'"$ORDERER1_ORG0_PORT"' -c mychannel --tls --cafile "/tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"'
 
 infoln "Successfully fetched latest configuration block"
 
@@ -182,7 +192,7 @@ docker exec -it cli-org2 sh -c 'export CORE_PEER_TLS_ENABLED=true \
 && export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org2/peer1/assets/tls-ca/tls-ca-cert.pem \
 && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp \
 && export CORE_PEER_ADDRESS=peer1-org2:7051 \
-&& peer channel update -f /tmp/hyperledger/org2/peer1/assets/org3_update_in_envelope.pb -c mychannel -o orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org2/peer1/assets/tls-ca/tls-ca-cert.pem'
+&& peer channel update -f /tmp/hyperledger/org2/peer1/assets/org3_update_in_envelope.pb -c mychannel -o orderer1-org0:'"$ORDERER1_ORG0_PORT"' --tls --cafile /tmp/hyperledger/org2/peer1/assets/tls-ca/tls-ca-cert.pem'
 
 infoln "Channel update of org3 successful."
 
@@ -200,21 +210,21 @@ docker exec -it cli-org3 sh -c 'export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/
 && export CORE_PEER_TLS_ENABLED=true \
 && export CORE_PEER_LOCALMSPID="org3MSP" \
 && export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org3/peer1/assets/tls-ca/tls-ca-cert.pem \
-&& export CORE_PEER_ADDRESS=peer1-org3:7051 \
-&& peer channel fetch 0 /tmp/hyperledger/org3/peer1/assets/mychannel.block -o orderer1-org0:7050 -c mychannel --tls --cafile /tmp/hyperledger/org3/peer1/assets/tls-ca/tls-ca-cert.pem \
+&& export CORE_PEER_ADDRESS=peer1-org3:'"$PEER1_ORG3_PORT"' \
+&& peer channel fetch 0 /tmp/hyperledger/org3/peer1/assets/mychannel.block -o orderer1-org0:'"$ORDERER1_ORG0_PORT"' -c mychannel --tls --cafile /tmp/hyperledger/org3/peer1/assets/tls-ca/tls-ca-cert.pem \
 && peer channel join -b /tmp/hyperledger/org3/peer1/assets/mychannel.block \
-&& export CORE_PEER_ADDRESS=peer2-org3:7051 \
+&& export CORE_PEER_ADDRESS=peer2-org3:'"$PEER2_ORG3_PORT"' \
 && peer channel join -b /tmp/hyperledger/org3/peer1/assets/mychannel.block'
 
 infoln "Install and Approve Chaincode"
 infoln "Org3"
 rsync -a --exclude=node_modules/ ../chaincode /tmp/hyperledger/org3/peer1/assets/
 
-docker exec -it cli-org3 sh -c "export CORE_PEER_ADDRESS=peer1-org3:7051 \
+docker exec -it cli-org3 sh -c "export CORE_PEER_ADDRESS=peer1-org3:$PEER1_ORG3_PORT \
 && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
 && peer lifecycle chaincode package cp.tar.gz --lang node --path /opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode --label cp_0 \
 && peer lifecycle chaincode install cp.tar.gz \
-&& export CORE_PEER_ADDRESS=peer2-org3:7051 \
+&& export CORE_PEER_ADDRESS=peer2-org3:$PEER2_ORG3_PORT \
 && peer lifecycle chaincode install cp.tar.gz \
 "
 
@@ -222,7 +232,7 @@ sleep 5
 
 docker exec -it cli-org3 sh -c 'export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
 && export PACKAGE_ID=$(peer lifecycle chaincode queryinstalled | grep Package | sed -e "s/.*Package ID: \(.*\), Label:.*/\1/") \
-&& peer lifecycle chaincode approveformyorg --orderer orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org3/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --channelID mychannel --name mycc -v 0 --package-id $PACKAGE_ID --sequence 1
+&& peer lifecycle chaincode approveformyorg --orderer orderer1-org0:'"$ORDERER1_ORG0_PORT"' --tls --cafile /tmp/hyperledger/org3/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --channelID mychannel --name mycc -v 0 --package-id $PACKAGE_ID --sequence 1
 '
 
 infoln "Test Chaincode from Org3"
