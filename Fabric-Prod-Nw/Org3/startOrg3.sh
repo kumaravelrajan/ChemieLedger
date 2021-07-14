@@ -210,12 +210,17 @@ infoln "Install and Approve Chaincode"
 infoln "Org3"
 rsync -a --exclude=node_modules/ ../chaincode /tmp/hyperledger/org3/peer1/assets/
 
-docker exec -it cli-org3 sh -c 'export CORE_PEER_ADDRESS=peer1-org3:7051 \
+docker exec -it cli-org3 sh -c "export CORE_PEER_ADDRESS=peer1-org3:7051 \
 && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
 && peer lifecycle chaincode package cp.tar.gz --lang node --path /opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode --label cp_0 \
 && peer lifecycle chaincode install cp.tar.gz \
 && export CORE_PEER_ADDRESS=peer2-org3:7051 \
 && peer lifecycle chaincode install cp.tar.gz \
+"
+
+sleep 5
+
+docker exec -it cli-org3 sh -c 'export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
 && export PACKAGE_ID=$(peer lifecycle chaincode queryinstalled | grep Package | sed -e "s/.*Package ID: \(.*\), Label:.*/\1/") \
 && peer lifecycle chaincode approveformyorg --orderer orderer1-org0:7050 --tls --cafile /tmp/hyperledger/org3/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --channelID mychannel --name mycc -v 0 --package-id $PACKAGE_ID --sequence 1
 '
