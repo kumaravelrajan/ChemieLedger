@@ -20,7 +20,7 @@ function infoln() {
 
 infoln "Starting base network before adding org3"
 ORG3PATH=$PWD
-cd ../Main-Docker-Compose/
+cd ../Base-Network/
 ./start.sh
 cd $ORG3PATH
 infoln "Base network created successfully. Adding org3 to network now.."

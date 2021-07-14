@@ -22,7 +22,7 @@ infoln "Cleaning up previous network (if any) before starting new network"
 ./cleanup.sh
 
 infoln "Create custom docker-compose file"
-. ./scripts/env.sh
+. ../env.sh
 . ./scripts/CreateDockerCompose.sh
 
 infoln "Create custom configtx.yml file"

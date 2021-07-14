@@ -1,5 +1,5 @@
 #!/bin/bash
-. ./scripts/env.sh
+. ../env.sh
 cat <<EOT >> ./docker-compose.yml
 version: '2'
 
