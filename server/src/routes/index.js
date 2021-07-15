@@ -25,8 +25,8 @@ router.use('/product', cors({ methods: 'GET, POST, DELETE' }), product)
 router.use('/request', cors({ methods: 'GET, POST, DELETE, PATCH' }), request)
 router.use('/communication', cors({ methods: 'GET, POST' }), communication)
 router.use('/notification', cors({ methods: 'GET' }), notification)
-router.use('/pricehistory', cors({ mothods: 'GET' }), pricehistory)
-router.use('/video', cors({ mothods: 'GET' }), video)
-router.use('/fabric', cors({ mothods: 'GET, POST, PATCH, DELETE' }), fabric)
+router.use('/pricehistory', cors({ methods: 'GET' }), pricehistory)
+router.use('/video', cors({ methods: 'GET' }), video)
+router.use('/fabric', cors({ methods: 'GET, POST, PATCH, DELETE' }), fabric)
 
 module.exports = router
