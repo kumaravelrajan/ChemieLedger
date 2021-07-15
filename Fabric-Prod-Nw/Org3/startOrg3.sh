@@ -48,10 +48,10 @@ I=0
 while [ $I -lt ${#PEER_PORTS_ORG3[@]} ]
 do
   infoln "Registering peer$((I+1))-org3"
-  fabric-ca-client register -d --id.name peer$((I+1))-org3 --id.secret peer1PW --id.type peer -u https://0.0.0.0:7052
+  fabric-ca-client register -d --id.name peer$((I+1))-org3 --id.secret peer$((I+1))PW --id.type peer -u https://0.0.0.0:7052
   I=$((I+1))
 done
-exit
+
 infoln "Setup Org3’s CA"
 docker-compose up -d rca-org3
 
@@ -59,51 +59,41 @@ infoln "Enroll Org3’s CA Admin"
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org3/ca/crypto/ca-cert.pem
 export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org3/ca/admin
 fabric-ca-client enroll -d -u https://rca-org3-admin:rca-org3-adminpw@0.0.0.0:7056
-fabric-ca-client register -d --id.name peer1-org3 --id.secret peer1PW --id.type peer -u https://0.0.0.0:7056
-fabric-ca-client register -d --id.name peer2-org3 --id.secret peer2PW --id.type peer -u https://0.0.0.0:7056
+I=0
+while [ $I -lt ${#PEER_PORTS_ORG3[@]} ]
+do
+  infoln "Registering peer$((I+1))-org3"
+  fabric-ca-client register -d --id.name peer$((I+1))-org3 --id.secret peer$((I+1))PW --id.type peer -u https://0.0.0.0:7056
+  I=$((I+1))
+done
 fabric-ca-client register -d --id.name admin-org3 --id.secret org3AdminPW --id.type admin -u https://0.0.0.0:7056
 fabric-ca-client register -d --id.name user-org3 --id.secret org3UserPW --id.type user -u https://0.0.0.0:7056
 
 infoln "Setup Org3’s Peers"
-# Enroll Peer1 against Org3 CA
-mkdir -p /tmp/hyperledger/org3/peer1/assets/ca
-cp /tmp/hyperledger/org3/ca/crypto/ca-cert.pem /tmp/hyperledger/org3/peer1/assets/ca/ca-cert.pem
+I=0
+while [ $I -lt ${#PEER_PORTS_ORG3[@]} ]
+do
+  mkdir -p /tmp/hyperledger/org3/peer$((I+1))/assets/ca
 
-export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org3/peer1
-export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org3/peer1/assets/ca/ca-cert.pem
-export FABRIC_CA_CLIENT_MSPDIR=msp
-fabric-ca-client enroll -d -u https://peer1-org3:peer1PW@0.0.0.0:7056
+  cp /tmp/hyperledger/org3/ca/crypto/ca-cert.pem /tmp/hyperledger/org3/peer$((I+1))/assets/ca/ca-cert.pem
 
-#Enroll Peer 1 against TLS CA
-mkdir -p /tmp/hyperledger/org3/peer1/assets/tls-ca
-cp /tmp/hyperledger/tls-ca/crypto/ca-cert.pem /tmp/hyperledger/org3/peer1/assets/tls-ca/tls-ca-cert.pem
+  # Enroll Peers against Org3 CA
+  export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org3/peer$((I+1))
+  export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org3/peer$((I+1))/assets/ca/ca-cert.pem
+  export FABRIC_CA_CLIENT_MSPDIR=msp
+  fabric-ca-client enroll -d -u https://peer$((I+1))-org3:peer$((I+1))PW@0.0.0.0:7056
 
-export FABRIC_CA_CLIENT_MSPDIR=tls-msp
-export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org3/peer1/assets/tls-ca/tls-ca-cert.pem
-fabric-ca-client enroll -d -u https://peer1-org3:peer1PW@0.0.0.0:7052 --enrollment.profile tls --csr.hosts peer1-org3
-#Change name of key to key.pem
-mv /tmp/hyperledger/org3/peer1/tls-msp/keystore/* /tmp/hyperledger/org3/peer1/tls-msp/keystore/key.pem
+  #Enroll Peer 1 against TLS CA
+  mkdir -p /tmp/hyperledger/org3/peer$((I+1))/assets/tls-ca
+  cp /tmp/hyperledger/tls-ca/crypto/ca-cert.pem /tmp/hyperledger/org3/peer$((I+1))/assets/tls-ca/tls-ca-cert.pem
 
-infoln "Enroll Peer2"
-mkdir -p /tmp/hyperledger/org3/peer2/assets/ca
-cp /tmp/hyperledger/org3/ca/crypto/ca-cert.pem /tmp/hyperledger/org3/peer2/assets/ca/ca-cert.pem
-
-# Enroll peer2 against org3 CA
-export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org3/peer2
-export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org3/peer2/assets/ca/ca-cert.pem
-export FABRIC_CA_CLIENT_MSPDIR=msp
-fabric-ca-client enroll -d -u https://peer2-org3:peer2PW@0.0.0.0:7056
-
-#Enroll Peer 2 against TLS CA
-mkdir -p /tmp/hyperledger/org3/peer2/assets/tls-ca
-cp /tmp/hyperledger/tls-ca/crypto/ca-cert.pem /tmp/hyperledger/org3/peer2/assets/tls-ca/tls-ca-cert.pem
-
-export FABRIC_CA_CLIENT_MSPDIR=tls-msp
-export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org3/peer2/assets/tls-ca/tls-ca-cert.pem
-fabric-ca-client enroll -d -u https://peer2-org3:peer2PW@0.0.0.0:7052 --enrollment.profile tls --csr.hosts peer2-org3
-
-#Change name of key to key.pem
-mv /tmp/hyperledger/org3/peer2/tls-msp/keystore/* /tmp/hyperledger/org3/peer2/tls-msp/keystore/key.pem
+  export FABRIC_CA_CLIENT_MSPDIR=tls-msp
+  export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org3/peer$((I+1))/assets/tls-ca/tls-ca-cert.pem
+  fabric-ca-client enroll -d -u https://peer$((I+1))-org3:peer$((I+1))PW@0.0.0.0:7052 --enrollment.profile tls --csr.hosts peer$((I+1))-org3
+  #Change name of key to key.pem
+  mv /tmp/hyperledger/org3/peer$((I+1))/tls-msp/keystore/* /tmp/hyperledger/org3/peer$((I+1))/tls-msp/keystore/key.pem
+  I=$((I+1))
+done
 
 infoln "Enroll Org3's Admin"
 export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org3/admin
@@ -128,11 +118,15 @@ echo 'NodeOUs:
     Certificate: cacerts/ca-cert.pem
     OrganizationalUnitIdentifier: orderer' > "/tmp/hyperledger/org3/msp/config.yaml"
 
-cp /tmp/hyperledger/org3/msp/config.yaml /tmp/hyperledger/org3/peer1/msp/
-cp /tmp/hyperledger/org3/msp/config.yaml /tmp/hyperledger/org3/peer2/msp/
+I=0
+while [ $I -lt ${#PEER_PORTS_ORG3[@]} ]
+do
+  cp /tmp/hyperledger/org3/msp/config.yaml /tmp/hyperledger/org3/peer$((I+1))/msp/
+  mv /tmp/hyperledger/org3/peer$((I+1))/msp/cacerts/* /tmp/hyperledger/org3/peer$((I+1))/msp/cacerts/ca-cert.pem
+  I=$((I+1))
+done
+
 cp /tmp/hyperledger/org3/msp/config.yaml /tmp/hyperledger/org3/admin/msp/
-mv /tmp/hyperledger/org3/peer1/msp/cacerts/* /tmp/hyperledger/org3/peer1/msp/cacerts/ca-cert.pem
-mv /tmp/hyperledger/org3/peer2/msp/cacerts/* /tmp/hyperledger/org3/peer2/msp/cacerts/ca-cert.pem
 mv /tmp/hyperledger/org3/admin/msp/cacerts/* /tmp/hyperledger/org3/admin/msp/cacerts/ca-cert.pem
 
 # Moving certificates to org3/msp
@@ -142,20 +136,18 @@ mkdir -p /tmp/hyperledger/org3/msp/tlscacerts
 cp /tmp/hyperledger/tls-ca/crypto/ca-cert.pem /tmp/hyperledger/org3/msp/tlscacerts/tls-ca-cert.pem
 
 infoln "Launch Org3’s Peers"
-docker-compose up -d peer1-org3
-docker-compose up -d peer2-org3
-
+I=0
+while [ $I -lt ${#PEER_PORTS_ORG3[@]} ]
+do
+  docker-compose up -d peer$((I+1))-org3
+  I=$((I+1))
+done
 
 
 infoln "Print org3 org definition"
 configtxgen -printOrg org3 > /tmp/hyperledger/org3/peer1/assets/org3.json
 
 infoln "Fetch existing Channel configuration"
-mkdir -p /tmp/hyperledger/org3/msp/cacerts
-cp /tmp/hyperledger/org3/ca/crypto/ca-cert.pem /tmp/hyperledger/org3/msp/cacerts/ca-cert.pem
-mkdir -p /tmp/hyperledger/org3/msp/tlscacerts
-cp /tmp/hyperledger/tls-ca/crypto/ca-cert.pem /tmp/hyperledger/org3/msp/tlscacerts/tls-ca-cert.pem
-
 infoln "Operating as Org1 admin from cli-org1"
 docker exec -it cli-org1 sh -c 'export CORE_PEER_TLS_ENABLED=true \
 && export CORE_PEER_LOCALMSPID="org1MSP" \
@@ -211,30 +203,48 @@ infoln "Create org3 CLI Container"
 docker-compose up -d cli-org3
 
 infoln "Org3 Join Channel"
-# cp /tmp/hyperledger/org0/orderer/channel.tx /tmp/hyperledger/org3/peer1/assets/channel.tx
 
 infoln "peer1-org3 and peer2-org3 joining channel"
-docker exec -it cli-org3 sh -c 'export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
-&& export CORE_PEER_TLS_ENABLED=true \
-&& export CORE_PEER_LOCALMSPID="org3MSP" \
-&& export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org3/peer1/assets/tls-ca/tls-ca-cert.pem \
-&& export CORE_PEER_ADDRESS=peer1-org3:'"$PEER1_ORG3_PORT"' \
-&& peer channel fetch 0 /tmp/hyperledger/org3/peer1/assets/mychannel.block -o orderer1-org0:'"$ORDERER1_ORG0_PORT"' -c mychannel --tls --cafile /tmp/hyperledger/org3/peer1/assets/tls-ca/tls-ca-cert.pem \
-&& peer channel join -b /tmp/hyperledger/org3/peer1/assets/mychannel.block \
-&& export CORE_PEER_ADDRESS=peer2-org3:'"$PEER2_ORG3_PORT"' \
-&& peer channel join -b /tmp/hyperledger/org3/peer1/assets/mychannel.block'
+
+I=0
+while [ $I -lt ${#PEER_PORTS_ORG3[@]} ]
+do
+  if [ $I -eq 0 ]
+  then
+    docker exec -it cli-org3 sh -c 'export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
+    && export CORE_PEER_TLS_ENABLED=true \
+    && export CORE_PEER_LOCALMSPID="org3MSP" \
+    && export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org3/peer1/assets/tls-ca/tls-ca-cert.pem \
+    && export CORE_PEER_ADDRESS='"peer$((I+1))"'-org3:'"${PEER_PORTS_ORG3[$I]}"' \
+    && peer channel fetch 0 /tmp/hyperledger/org3/peer1/assets/mychannel.block -o orderer1-org0:'"$ORDERER1_ORG0_PORT"' -c mychannel --tls --cafile /tmp/hyperledger/org3/peer1/assets/tls-ca/tls-ca-cert.pem \
+    && peer channel join -b /tmp/hyperledger/org3/peer1/assets/mychannel.block \'
+  else
+    docker exec -it cli-org3 sh -c 'export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
+    && export CORE_PEER_TLS_ENABLED=true \
+    && export CORE_PEER_LOCALMSPID="org3MSP" \
+    && export CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org3/peer1/assets/tls-ca/tls-ca-cert.pem \
+    && export CORE_PEER_ADDRESS='"peer$((I+1))"'-org3:'"${PEER_PORTS_ORG3[$I]}"' \
+    && peer channel join -b /tmp/hyperledger/org3/peer1/assets/mychannel.block \'
+  fi
+
+  I=$((I+1))
+done
 
 infoln "Install and Approve Chaincode"
 infoln "Org3"
 rsync -a --exclude=node_modules/ ../chaincode /tmp/hyperledger/org3/peer1/assets/
 
-docker exec -it cli-org3 sh -c "export CORE_PEER_ADDRESS=peer1-org3:$PEER1_ORG3_PORT \
-&& export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
-&& peer lifecycle chaincode package cp.tar.gz --lang node --path /opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode --label cp_0 \
-&& peer lifecycle chaincode install cp.tar.gz \
-&& export CORE_PEER_ADDRESS=peer2-org3:$PEER2_ORG3_PORT \
-&& peer lifecycle chaincode install cp.tar.gz \
-"
+I=0
+while [ $I -lt ${#PEER_PORTS_ORG3[@]} ]
+do
+  docker exec -it cli-org3 sh -c "export CORE_PEER_ADDRESS=peer$((I+1))-org3:${PEER_PORTS_ORG3[$I]} \
+  && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp \
+  && peer lifecycle chaincode package cp.tar.gz --lang node --path /opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode --label cp_0 \
+  && peer lifecycle chaincode install cp.tar.gz \
+  "
+
+  I=$((I+1))
+done
 
 sleep 10
 
