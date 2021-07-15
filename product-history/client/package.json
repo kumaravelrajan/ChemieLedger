@@ -20,6 +20,7 @@
     "@angular/platform-browser-dynamic": "~12.1.2",
     "@angular/router": "~12.1.2",
     "@swimlane/ngx-graph": "^7.2.0",
+    "dagre": "^0.8.5",
     "rxjs": "~6.6.0",
     "tslib": "^2.2.0",
     "zone.js": "~0.11.4"
@@ -30,6 +31,7 @@
     "@angular/compiler-cli": "~12.1.2",
     "@types/d3": "^7.0.0",
     "@types/d3-drag": "^3.0.1",
+    "@types/dagre": "^0.7.45",
     "@types/jasmine": "~3.8.0",
     "@types/node": "^12.11.1",
     "jasmine-core": "~3.8.0",

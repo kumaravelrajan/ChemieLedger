@@ -1498,6 +1498,11 @@
     "@types/d3-transition" "*"
     "@types/d3-zoom" "*"
 
+"@types/dagre@^0.7.45":
+  version "0.7.45"
+  resolved "https://registry.yarnpkg.com/@types/dagre/-/dagre-0.7.45.tgz#e53593e3223b3fc154e0b57a39586ce6f8ea5522"
+  integrity sha512-hyVsm212IGTE2nYE1coMzGBSbes9neRSJDWn2UfyVZ4l0x5nIF/oWVY7RbKDhfNCdfZn4k0gdxvYWDWiSif+RA==
+
 "@types/eslint-scope@^3.7.0":
   version "3.7.1"
   resolved "https://registry.yarnpkg.com/@types/eslint-scope/-/eslint-scope-3.7.1.tgz#8dc390a7b4f9dd9f1284629efce982e41612116e"
@@ -3066,7 +3071,7 @@ d3-transition@1, d3-transition@^1.1.1, d3-transition@^1.3.2:
     d3-selection "^1.1.0"
     d3-timer "1"
 
-dagre@^0.8.4:
+dagre@^0.8.4, dagre@^0.8.5:
   version "0.8.5"
   resolved "https://registry.yarnpkg.com/dagre/-/dagre-0.8.5.tgz#ba30b0055dac12b6c1fcc247817442777d06afee"
   integrity sha512-/aTqmnRta7x7MCCpExk7HQL2O4owCT2h8NT//9I1OQ9vt29Pa0BzSAkR5lwFUcQ7491yVi/3CXU9jQ5o0Mn2Sw==
