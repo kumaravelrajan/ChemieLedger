@@ -31,20 +31,7 @@ export async function setup () {
 
     // setup the wallet to hold the credentials of the application user
     await buildWallet(Wallets, walletPath);
-	// await debug()
 }
-
-// async function debug() {
-// 	const nickname = ''
-// 	const name = 'surname'
-// 	const surname = 'surname'
-// 	const email = crypto.randomBytes(5).toString('hex')+'@gmail.com'
-// 	const password = '2035u3Djn23r42ß9'
-// 	let user = await createUser(nickname, name, surname, email, password)
-// 	user.isVerified = true
-// 	user = await updateUser(user)
-// 	console.log(await callChainCode(user, ['addProduct', 'ABC', 50.2, 'kg', 0, '{}', '[]', '{}']))
-// }
 
 const buildCCP = () => {
     // load the common connection configuration file

@@ -34,7 +34,7 @@ function disconnectFromGateway() {
 }
 
 export async function callChainCode(user, ...chaincode_args) {
-	const userIdentity = await wallet.get(user._id.toString());
+	let userIdentity = await wallet.get(user._id.toString());
 	if (!userIdentity) {
         if (!user.x509Identity) {
             user = await enrollUser(user)
@@ -44,7 +44,7 @@ export async function callChainCode(user, ...chaincode_args) {
         }
 	}
     const contract = await connectToGateway(user._id.toString())
-    const response = (await contract.submitTransaction(...chaincode_args)).toString();
+    const response = await contract.submitTransaction(...chaincode_args)
     disconnectFromGateway();
-    return response
+    return response.toString();
 }

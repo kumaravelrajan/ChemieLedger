@@ -42,9 +42,7 @@ const getProduct = async (req, res, next) => {
 }
 
 const setRemainingSource = async (req, res, next) => {
-    console.log('+++++++++++++++++')
     const user = await getUser(req.user._id)
-    console.log(req.params)
     try {
         const response = await callChainCode(
             user,
@@ -61,7 +59,6 @@ const setRemainingSource = async (req, res, next) => {
 
 const addTrade = async (req, res, next) => {
     const user = await getUser(req.user._id)
-    console.log(req.body)
     const trade = req.body.trade
     try {
         const response = await callChainCode(
