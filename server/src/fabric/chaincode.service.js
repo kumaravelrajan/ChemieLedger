@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config()
 import  { Gateway } from 'fabric-network'
-import { ccp, wallet, enrollUser } from './fabric.service'
+import { ccp, wallet, enrollUser, decryptX509Identity } from './fabric.service'
 const CHANNEL_NAME = process.env.CHANNEL_NAME
 const CHAINCODE_ID = process.env.CHAINCODE_ID
 let gateway
@@ -33,8 +33,8 @@ function disconnectFromGateway() {
     gateway.disconnect();
 }
 
-export async function callChainCode(user, chaincode_args) {
-	const userIdentity = await wallet.get(user._id.toString());
+export async function callChainCode(user, ...chaincode_args) {
+	let userIdentity = await wallet.get(user._id.toString());
 	if (!userIdentity) {
         if (!user.x509Identity) {
             user = await enrollUser(user)
@@ -44,7 +44,7 @@ export async function callChainCode(user, chaincode_args) {
         }
 	}
     const contract = await connectToGateway(user._id.toString())
-    const response = (await contract.submitTransaction(...chaincode_args)).toString();
+    const response = await contract.submitTransaction(...chaincode_args)
     disconnectFromGateway();
-    return response
+    return response.toString();
 }
