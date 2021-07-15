@@ -4,7 +4,7 @@ set -e
 # Import env.sh
 . ../env.sh
 
-if [ ! $SILENCE_INFOLN_AND_SCRIPT_TRACING ]
+if [ "$SILENCE_INFOLN_AND_SCRIPT_TRACING"=false ]
 then
   set -o xtrace
 fi
@@ -17,7 +17,7 @@ function println() {
 C_YELLOW='\033[1;33m'
 C_RESET='\033[0m'
 function infoln() {
-    if [ ! $SILENCE_INFOLN_AND_SCRIPT_TRACING ]
+    if [ "$SILENCE_INFOLN_AND_SCRIPT_TRACING"=false ]
     then
       set +x
       println "${C_YELLOW}*****************************************${C_RESET}"
@@ -47,7 +47,7 @@ infoln "Create custom configtx.yml file"
 infoln "Setup TLS CA"
 infoln "Enroll TLS CA’s Admin"
 docker-compose up -d ca-tls
-sleep 5
+##sleep 5
 
 # Export path of bin files
 export PATH=${PWD}/../Fabric-bin:$PATH
@@ -63,7 +63,7 @@ fabric-ca-client register -d --id.name orderer1-org0 --id.secret ordererPW --id.
 
 infoln "Setup Orderer Org CA"
 docker-compose up -d rca-org0
-sleep 5
+##sleep 5
 
 infoln "Enroll Orderer Org’s CA Admin"
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org0/ca/crypto/ca-cert.pem
@@ -74,7 +74,7 @@ fabric-ca-client register -d --id.name admin-org0 --id.secret org0adminpw --id.t
 
 infoln "Setup Org1’s CA"
 docker-compose up -d rca-org1
-sleep 5
+##sleep 5
 
 infoln "Enroll Org1’s CA Admin"
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org1/ca/crypto/ca-cert.pem
@@ -87,7 +87,7 @@ fabric-ca-client register -d --id.name user-org1 --id.secret org1UserPW --id.typ
 
 infoln "Setup Org2’s CA"
 docker-compose up -d rca-org2
-sleep 5
+##sleep 5
 
 infoln "Enrolling Org2’s CA Admin"
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org2/ca/crypto/ca-cert.pem
@@ -167,9 +167,9 @@ mv /tmp/hyperledger/org1/admin/msp/cacerts/* /tmp/hyperledger/org1/admin/msp/cac
 
 infoln "Launch Org1’s Peers"
 docker-compose up -d peer1-org1
-sleep 5
+##sleep 5
 docker-compose up -d peer2-org1
-sleep 5
+# #sleep 5
 
 infoln "Setup Org2’s Peers"
 infoln "Enroll Peer1"
@@ -240,9 +240,9 @@ mv /tmp/hyperledger/org2/peer2/msp/cacerts/* /tmp/hyperledger/org2/peer2/msp/cac
 mv /tmp/hyperledger/org2/admin/msp/cacerts/* /tmp/hyperledger/org2/admin/msp/cacerts/ca-cert.pem
 
 docker-compose up -d peer1-org2
-sleep 5
+# #sleep 5
 docker-compose up -d peer2-org2
-sleep 5
+# #sleep 5
 
 infoln "Setup Orderer"
 infoln "Enroll Orderer"
@@ -313,16 +313,16 @@ configtxgen -profile OrgsChannel -outputCreateChannelTx /tmp/hyperledger/org0/or
 
 infoln "Launch Orderer"
 docker-compose up -d orderer1-org0
-sleep 5
+#sleep 5
 
 infoln "Create CLI Containers"
 infoln "Launch Org1’s CLI"
 docker-compose up -d cli-org1
-sleep 5
+#sleep 5
 
 infoln "Launch Org2’s CLI"
 docker-compose up -d cli-org2
-sleep 5
+#sleep 5
 
 infoln "Create and Join Channel"
 
@@ -354,12 +354,12 @@ docker exec -it cli-org1 sh -c "export CORE_PEER_ADDRESS=peer1-org1:$PEER1_ORG1_
 && peer lifecycle chaincode install cp.tar.gz
 "
 
-sleep 5
+#sleep 5
 
 docker exec -it cli-org1 sh -c 'export PACKAGE_ID=$(peer lifecycle chaincode queryinstalled | grep Package | sed -e "s/.*Package ID: \(.*\), Label:.*/\1/") \
 && peer lifecycle chaincode approveformyorg --orderer orderer1-org0:'"$ORDERER1_ORG0_PORT"' --tls --cafile /tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --channelID mychannel --name mycc -v 0 --package-id $PACKAGE_ID --sequence 1
 '
-sleep 5
+#sleep 5
 
 infoln "Install, Approve and Commit Chaincode"
 infoln "Org2"
@@ -371,7 +371,7 @@ docker exec -it cli-org2 sh -c "export CORE_PEER_ADDRESS=peer1-org2:$PEER1_ORG2_
 && peer lifecycle chaincode install cp.tar.gz
 "
 
-sleep 5
+#sleep 5
 
 docker exec -it cli-org2 sh -c 'export PACKAGE_ID=$(peer lifecycle chaincode queryinstalled | grep Package | sed -e "s/.*Package ID: \(.*\), Label:.*/\1/") \
 && peer lifecycle chaincode approveformyorg --orderer orderer1-org0:'"$ORDERER1_ORG0_PORT"' --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem --channelID mychannel --name mycc -v 0 --package-id $PACKAGE_ID --sequence 1 \
@@ -381,7 +381,7 @@ docker exec -it cli-org2 sh -c 'export PACKAGE_ID=$(peer lifecycle chaincode que
 infoln "Test Chaincode from Org1"
 docker exec -it cli-org1 sh -c "peer chaincode invoke -C mychannel -n mycc -c '{\"Args\":[\"addProduct\",\"x\",\"50.4\",\"kg\", \"\", \"{}\", \"[]\", \"{}\"]}' --tls --cafile /tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
 "
-sleep 5
+#sleep 5
 
 infoln "Test Chaincode from Org2"
 docker exec -it cli-org2 sh -c "peer chaincode invoke -C mychannel -n mycc -c '{\"Args\":[\"addProduct\",\"x\",\"50.4\",\"kg\", \"\", \"{}\", \"[]\", \"{}\"]}' --tls --cafile /tmp/hyperledger/org2/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem

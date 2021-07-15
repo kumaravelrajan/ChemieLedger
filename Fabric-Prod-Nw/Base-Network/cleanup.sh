@@ -17,3 +17,15 @@ then
     rm ./configtx.yaml
     echo "Removed configtx.yaml file"
 fi
+
+if [ -f "./ca-cert.pem" ]
+then
+    rm ./ca-cert.pem
+    echo "Removed ca-cert.pem file"
+fi
+
+if [ -f "./tls-ca-cert.pem" ]
+then
+    rm ./tls-ca-cert.pem
+    echo "Removed tls-ca-cert.pem file"
+fi

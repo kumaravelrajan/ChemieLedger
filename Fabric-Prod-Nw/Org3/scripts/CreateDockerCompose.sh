@@ -81,7 +81,7 @@ services:
             - CORE_PEER_LOCALMSPID=org3MSP
             - CORE_PEER_TLS_ENABLED=true
             - CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org3/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
-            - CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/peer1/msp
+            - CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/org3
         command: sh
         volumes:
