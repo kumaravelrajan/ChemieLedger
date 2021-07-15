@@ -1,6 +1,7 @@
 export enum Unit {
     Kilogram = 'kg',
-    Liter = 'l'
+    Liter = 'l',
+    Pieces = 'pcs'
 };
 export type ProductMaterial = {[ID: string]: number};
 export type Location = {x: number, y: number};
@@ -11,9 +12,11 @@ export interface Product {
     /** Name of the product */
     productName: string,
     /** ID of the original owner / producer of the product  */
-    owner: string,
+    producer: string,
+    /** Total amount that was produced of this product */
+    producedAmount: number;
     /** Total available amount of the product */
-    amount: number,
+    availableAmount: number,
     /** Unit in which the amount is given */
     unit: Unit,
     /** Date of production / harvest */
@@ -29,8 +32,8 @@ export interface Product {
 export interface Trade {
     /** unique Trade ID */
     ID: string,
-    /** ID of transferred product */
-    productID: string,
+    /** ID of source. Can either be a Product or another Trade */
+    sourceID: string,
     /** ID of seller */
     seller: string,
     /** ID of buyer */
@@ -38,16 +41,17 @@ export interface Trade {
     /** Amount of product that was transferred in the specified unit. This amount must be less or equal to the product's total amount */
     amountTransferred: number,
     /** The amount the product that is still available for referencing. Initially equal to amount Transferred. */
-    amountAvailable: number,
+    availableAmount: number,
     /** The unit the product is measured in. */
     unit: Unit
+    /** The date this trade was performed */
+    date: number
 }
 
-export interface ProductHistory {
-    /** Product */
-    product: Product,
+export interface ProductHistory extends Omit<Product, 'productMaterial'> {
     /** List of used Materials for that product. */
-    productMaterial: [ProductHistory, number][];
+    listOfOwnership: {owner: string, received: number}[]
+    productMaterial: {product: ProductHistory, usedAmount: number}[];
 }
 
 export interface LinkProposal {

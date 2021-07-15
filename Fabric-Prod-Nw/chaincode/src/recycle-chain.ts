@@ -2,25 +2,26 @@ import { Context, Contract, Info, Transaction } from 'fabric-contract-api';
 import { LinkProposal, Location, Product, ProductHistory, ProductMaterial, Trade, Unit } from './models';
 import getUuid = require('uuid-by-string');
 import * as crypto from 'crypto'
+import { RecycleChainV1 } from './recycle-chainV1.model';
 
 @Info({ title: 'RecycleChain', description: 'Smart contract for recycle chain'})
-export class RecycleChainContract extends Contract {
+export class RecycleChainContract extends Contract implements RecycleChainV1 {
 
-    /**
-     * Instantiate to perform any setup of the ledger that might be required.
-     * @param {Context} ctx the transaction context
-     */
-     @Transaction()
+    @Transaction()
     public async instantiate(ctx: Context) {
-        // No implementation required with this example
-        // It could be where data migration is performed, if necessary
         console.log('Instantiate the contract');
     }
 
-    IDCounter = 0
-    private nextID(): string {
-        this.IDCounter += 1
-        return getUuid(`${this.IDCounter}`)
+    @Transaction()
+    public async getUserID(context: Context): Promise<string> {
+        return this.getIdentity(context);
+    }
+
+    private async nextID(context: Context): Promise<string> {
+        let IDCounter = await this.safeReadStringFromState(context, '_ID_COUNTER');
+        if (IDCounter === undefined) { IDCounter = '0' }
+        await this.writeToState(context, '_ID_COUNTER', parseInt(IDCounter) + 1 );
+        return getUuid(`${IDCounter}`);
     }
 
     private getIdentity(context: Context): string {
@@ -63,7 +64,7 @@ export class RecycleChainContract extends Contract {
     public async addProduct(
         context: Context,
         productName: string,
-        amount: number,
+        producedAmount: number,
         unit: Unit,
         dateOfProduction: number,
         _locationOfProduction: string,
@@ -74,8 +75,8 @@ export class RecycleChainContract extends Contract {
             const owner = this.getIdentity(context);
             
             if (productName.length === 0 || productName.length > 100) { throw new Error(`ProductName must have between 0 and 100 characters`) }
-            amount = parseFloat('' + amount)
-            if (amount <= 0.) { throw new Error(`Amount must be a positive float but was ${amount}`)}
+            producedAmount = parseFloat('' + producedAmount)
+            if (producedAmount <= 0.) { throw new Error(`Amount must be a positive float but was ${producedAmount}`)}
             if (!Object.values(Unit).includes(unit)) { throw new Error(`Unit must be one of ${Object.values(Unit)}`) }
             dateOfProduction = parseFloat('' + dateOfProduction)
             if (dateOfProduction > Date.now()) { throw new Error(`Your date is in the future! ${dateOfProduction}`) }
@@ -85,19 +86,21 @@ export class RecycleChainContract extends Contract {
             if (certificates.some(x => typeof x !== 'string')) { throw new Error(`Certificates must be a list of strings!`) }
             let productMaterial: ProductMaterial = JSON.parse(_productMaterial);
             for(let [material, req_amount] of Object.entries(productMaterial)) {
-                const trade: Trade = await this.readObjectFromState(context, material);
-                const [_, eligibleIdentities] = await this.getWalletGroup(context, trade.buyer);
+                const source: Trade|Product = await this.readObjectFromState(context, material);
+                const ownerOfSource: string = this.isProduct(source)? source.producer : source.buyer;
+                const [_, eligibleIdentities] = await this.getWalletGroup(context, ownerOfSource);
                 if (!eligibleIdentities.includes(owner)) { throw new Error(`The caller was not the buyer in the Trade ${material} referenced in the list of materials!`)  }
-                if (req_amount <= 0 || trade.amountAvailable < amount) { 
-                    throw new Error(`Only ${trade.amountAvailable}${trade.unit} of trade ${material} are available, but ${req_amount}${trade.unit} were requested!`)
+                if (req_amount <= 0 || source.availableAmount < req_amount) { 
+                    throw new Error(`Only ${source.availableAmount}${source.unit} of trade ${material} are available, but ${req_amount}${source.unit} were requested!`)
                 }
             }
 
             const product: Product = {
-                ID: this.nextID(),
+                ID: `P#${await this.nextID(context)}`,
                 productName,
-                owner,
-                amount,
+                producer: owner,
+                producedAmount,
+                availableAmount: producedAmount,
                 unit,
                 dateOfProduction,
                 locationOfProduction,
@@ -109,61 +112,94 @@ export class RecycleChainContract extends Contract {
     }
 
     @Transaction()
-    public async getProduct(context: Context, productID: string): Promise<Product> {
-        return await this.readObjectFromState(context, productID) as Product;
+    public async setRemainingSource(context: Context, sourceID: string, newAmount: number): Promise<Product | Trade> {
+        const source: Product | Trade = await this.readObjectFromState(context, sourceID);
+        newAmount = parseFloat('' + newAmount);
+        let walletGroup: string[];
+        if (this.isProduct(source)) {
+            walletGroup = (await this.getWalletGroup(context, source.producer))[1];
+        } else if(this.isTrade(source)) {
+            walletGroup = (await this.getWalletGroup(context, source.buyer))[1];
+        } else {
+            throw new Error('The provided ID does not refer to a valid source!');
+        }
+        if (walletGroup.includes(this.getIdentity(context))) {
+            if(newAmount > source.availableAmount) {
+                throw new Error(`The maximum amount of a source cannot be increased! Availabe: ${source.availableAmount}, Requested: ${newAmount}`);
+            }
+            source.availableAmount = newAmount;
+            await this.writeToState(context, source.ID, source);
+            return source;
+        }
+        throw new Error(`Source with ID ${sourceID} does not belong to the caller!`);
     }
 
     @Transaction()
-    public async addTrade(context: Context, productID: string, buyer: string, amountTransferred: number): Promise<Trade> {
-        const seller = this.getIdentity(context);
-        const product: Product = await this.readObjectFromState(context, productID);
-        const [_, eligibleIdentities] = await this.getWalletGroup(context, product.owner);
-        if (!eligibleIdentities.includes(seller)) {
-            throw Error(`Product with ID ${productID} does not belong to this seller!`)
+    public async getProduct(context: Context, productID: string): Promise<Product> {
+        if (!this.isProduct({ID: productID})) {
+            throw new Error('The provided ID does not refer to a product!')
         }
-        if (product.amount < amountTransferred) {
-            throw Error(`Product with ID ${productID} has a total available amount of ${product.amount}${product.unit}, but ${amountTransferred}${product.unit} were requested!`)
+        const product = await this.readObjectFromState(context, productID) as Product;
+        return product;
+    }
+
+    @Transaction()
+    public async addTrade(context: Context, sourceID: string, buyer: string, amountTransferred: number): Promise<Trade> {
+        const seller = this.getIdentity(context);
+        const source: Product | Trade = await this.readObjectFromState(context, sourceID);
+        const ownerOfSource: string = this.isProduct(source)? source.producer : source.buyer;
+        const [_, eligibleIdentities] = await this.getWalletGroup(context, ownerOfSource);
+        if (!eligibleIdentities.includes(seller)) {
+            throw Error(`Product with ID ${sourceID} does not belong to this seller!`)
+        }
+        if (source.availableAmount < amountTransferred) {
+            throw Error(`Product with ID ${sourceID} has a total available amount of ${source.availableAmount}${source.unit}, but ${amountTransferred}${source.unit} were requested!`)
         }
         const trade: Trade = {
-            ID: this.nextID(),
-            productID,
+            ID: `T#${await this.nextID(context)}`,
+            sourceID: sourceID,
             seller,
             buyer,
             amountTransferred,
-            amountAvailable: amountTransferred,
-            unit: product.unit
+            availableAmount: amountTransferred,
+            unit: source.unit,
+            date: Date.now()
         }
-        product.amount = product.amount - amountTransferred;
-        this.writeToState(context, productID, product);
-        this.writeToState(context, trade.ID, trade);
+        source.availableAmount = source.availableAmount - amountTransferred;
+        await this.writeToState(context, sourceID, source);
+        await this.writeToState(context, trade.ID, trade);
         return trade
     }
 
     @Transaction()
-    public async querryProductHistory(context: Context, productID: string): Promise<ProductHistory> {
-        const productHistory: ProductHistory = await this.buildProductHistoryRec(context, productID)
+    public async queryProductHistory(context: Context, sourceID: string): Promise<ProductHistory> {
+        const productHistory: ProductHistory = await this.buildProductHistoryRec(context, sourceID, -1)
         return productHistory;
     }
 
-    private async buildProductHistoryRec(context: Context, productID: string): Promise<ProductHistory> {
-        const product: Product = await this.readObjectFromState(context, productID);
+    private async buildProductHistoryRec(context: Context, sourceID: string, amountFactor: number): Promise<ProductHistory> {
+        let source: Product| Trade = await this.readObjectFromState(context, sourceID);
+        const listOfOwnership: {owner: string, received: number}[] = [];
+        while(!this.isProduct(source)) {
+            listOfOwnership.push({owner: source.buyer, received: source.date });
+            source = await this.readObjectFromState(context, source.sourceID);
+        }
+        const product: Product = source;
+        listOfOwnership.push({owner: product.producer, received: product.dateOfProduction })
+        if (amountFactor == -1) {amountFactor = product.producedAmount}
+        amountFactor /=  product.producedAmount
         const productHistory: ProductHistory = {
-            product,
-            productMaterial: [] as [ProductHistory, number][]
+            ...product,
+            listOfOwnership,
+            productMaterial: [] as {product: ProductHistory, usedAmount: number}[]
         }
-        for (const [tradeID, amount] of Object.entries(product.productMaterial || {})) {
-            const trade: Trade = await this.readObjectFromState(context, tradeID);
-            productHistory.productMaterial.push([await this.buildProductHistoryRec(context, trade.productID), trade.amountTransferred]);
+        for (const [sourceID, amount] of Object.entries(product.productMaterial || {})) {
+            const upstreamProductHistory = await this.buildProductHistoryRec(context, sourceID, amountFactor * amount);
+            productHistory.productMaterial.push({ product: upstreamProductHistory, usedAmount: amountFactor * amount});
         }
         return productHistory;
     }
 
-    /**
-     * Queries all identites that share a wallet with the user's identity
-     * @param context 
-     * @param userID ID of the user
-     * @returns Array of length two with the linkToWalletGroup id and the set of linked identities
-     */
     @Transaction()
     public async queryWalletGroup(context: Context) : Promise<[string | undefined, string[]]> {
         return this.getWalletGroup(context, this.getIdentity(context));
@@ -181,37 +217,22 @@ export class RecycleChainContract extends Contract {
         return [linkToWalletGroup, JSON.parse(callerAuthorizedIdentities)];
     }
 
-    /**
-     * Register a temporary oneway link proposal to an identity.
-     * Once the other user confirms this link, the identities wallets groups are merged.
-     * A link proposal is only valid for the specified parties and must be confirm within 30min.
-     * @param context 
-     * @param userID ID of the user a link should be established to
-     * @returns Id of the link proposal. This ID must be presented when calling this.confirmLinkTo()
-     */
     @Transaction()
-    public async registerLinkProposal(context: Context, userID: string): Promise<string>{
+    public async registerLinkProposal(context: Context, userID: string): Promise<string> {
         const caller = this.getIdentity(context);
-        const linkProposalID = `linkID#${this.nextID()}`;
+        const linkProposalID = `linkID#${await this.nextID(context)}`;
         const linkProposal: LinkProposal = {
             from: caller,
             to: userID,
             // Valid for 30min
             validUntil: Date.now() + 1.8e+6
         }
-        this.writeToState(context, linkProposalID, linkProposal);
+        await this.writeToState(context, linkProposalID, linkProposal);
         return linkProposalID;
     }
 
-    /**
-     * Confirm a link proposal and therefore merge the users' wallet groups.
-     * @param context 
-     * @param userID : UserID of the identity the user want to link his wallet with
-     * @param linkProposalID : ID of the previously created link proposal
-     * @returns The new set of linked identities
-     */
     @Transaction()
-    public async confirmLinkTo(context: Context, userID: string, linkProposalID: string): Promise<string[]>{
+    public async confirmLinkTo(context: Context, userID: string, linkProposalID: string): Promise<string[]> {
         const caller = this.getIdentity(context);
         let tmp = await this.safeReadStringFromState(context, linkProposalID);
         if (tmp === undefined) {
@@ -226,30 +247,31 @@ export class RecycleChainContract extends Contract {
         const [__, userWalletGroup] = await this.getWalletGroup(context, userID);
         const newWalletGroup = Array.from(new Set([...callerWalletGroup, ...userWalletGroup]));
 
-        const walletGroupId = `walletGroup#${this.nextID()}`;
-        this.writeToState(context, walletGroupId, newWalletGroup);
-        newWalletGroup.forEach(userID => {
-            this.writeToState(context, `linkToWalletGroup#${userID}`, walletGroupId);
+        const walletGroupId = `walletGroup#${await this.nextID(context)}`;
+        await this.writeToState(context, walletGroupId, newWalletGroup);
+        newWalletGroup.forEach(async userID => {
+            await this.writeToState(context, `linkToWalletGroup#${userID}`, walletGroupId);
         })
         return newWalletGroup;
     }
 
-    /**
-     * Remove a user from the wallet group. This will revoke the user's access to the collective assets and the groups access to the user's assets
-     * @param context 
-     * @param userID : Id of the user that should be removed
-     * @returns The new set of linked identities
-     */
     @Transaction() 
     public async removeUserFromWalletGroup(context: Context, userID: string): Promise<string[]> {
         const caller = this.getIdentity(context);
         const [linkToWalletGroup, callerWalletGroup] = await this.getWalletGroup(context, caller);
         if(linkToWalletGroup !== undefined && callerWalletGroup.includes(userID) && caller !== userID) {
-            this.writeToState(context, linkToWalletGroup, callerWalletGroup.splice(callerWalletGroup.indexOf(userID), 1));
+            await this.writeToState(context, linkToWalletGroup, callerWalletGroup.splice(callerWalletGroup.indexOf(userID), 1));
             return callerWalletGroup
         }
         throw new Error(`The provided userID does not exist in the user's wallet group.`)
 
+    }
+
+    private isProduct(source: {ID: string}): source is Product {
+        return source.ID.startsWith('P#');
+    }
+    private isTrade(source: {ID: string}): source is Trade {
+        return source.ID.startsWith('T#');
     }
 
 }
