@@ -4,7 +4,7 @@ set -e
 # Import env.sh
 . ../env.sh
 
-if [ "$SILENCE_INFOLN_AND_SCRIPT_TRACING"=false ]
+if [[ $SILENCE_INFOLN_AND_SCRIPT_TRACING == false ]]
 then
   set -o xtrace
 fi
@@ -17,7 +17,7 @@ function println() {
 C_YELLOW='\033[1;33m'
 C_RESET='\033[0m'
 function infoln() {
-    if [ "$SILENCE_INFOLN_AND_SCRIPT_TRACING"=false ]
+    if [[ $SILENCE_INFOLN_AND_SCRIPT_TRACING == false ]]
     then
       set +x
       println "${C_YELLOW}*****************************************${C_RESET}"

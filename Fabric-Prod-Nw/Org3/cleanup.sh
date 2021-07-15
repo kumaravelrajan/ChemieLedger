@@ -1,10 +1,6 @@
 #!/bin/bash
 # Probably needs to be called with sudo!
 
-ORG3PATH=$PWD
-cd ../Base-Network/ && ./cleanup.sh
-cd $ORG3PATH
-
 if [ -f "./docker-compose.yml" ]
 then
     rm ./docker-compose.yml
