@@ -2,8 +2,9 @@ import dotenv from 'dotenv'
 dotenv.config()
 import  { Gateway } from 'fabric-network'
 import { ccp, wallet, enrollUser, decryptX509Identity } from './fabric.service'
-const CHANNEL_NAME = process.env.CHANNEL_NAME
-const CHAINCODE_ID = process.env.CHAINCODE_ID
+const CHANNEL_NAME  = process.env.CHANNEL_NAME
+const CHAINCODE_ID  = process.env.CHAINCODE_ID
+const caAdminUserId = process.env.CA_ADMIN_USER_ID;
 let gateway
 let contract
 
@@ -33,17 +34,17 @@ function disconnectFromGateway() {
     gateway.disconnect();
 }
 
-export async function callChainCode(user, chaincode_args) {
-	const userIdentity = await wallet.get(user._id.toString());
-	if (!userIdentity) {
-        if (!user.x509Identity) {
-            user = await enrollUser(user)
-        } else {
-            userIdentity = decryptX509Identity(user)
-            await wallet.put(user._id.toString(), userIdentity);
-        }
-	}
-    const contract = await connectToGateway(user._id.toString())
+export async function callChainCode(chaincode_args) {
+	// const userIdentity = await wallet.get(user._id.toString());
+	// if (!userIdentity) {
+    //     if (!user.x509Identity) {
+    //         user = await enrollUser(user)
+    //     } else {
+    //         userIdentity = decryptX509Identity(user)
+    //         await wallet.put(user._id.toString(), userIdentity);
+    //     }
+	// }
+    const contract = await connectToGateway(caAdminUserId.toString())
     const response = (await contract.submitTransaction(...chaincode_args)).toString();
     disconnectFromGateway();
     return response
