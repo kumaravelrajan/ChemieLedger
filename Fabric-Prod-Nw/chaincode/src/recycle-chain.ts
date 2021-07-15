@@ -10,6 +10,7 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
     @Transaction()
     public async instantiate(ctx: Context) {
         console.log('Instantiate the contract');
+        await this.writeToState(ctx, '_ID_COUNTER', 0);
     }
 
     @Transaction()
@@ -17,10 +18,11 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
         return this.getIdentity(context);
     }
 
-    IDCounter = 0
-    private nextID(): string {
-        this.IDCounter += 1
-        return getUuid(`${this.IDCounter}`)
+    private async nextID(context: Context): Promise<string> {
+        let IDCounter = await this.safeReadStringFromState(context, '_ID_COUNTER');
+        if (IDCounter === undefined) { IDCounter = '0' }
+        await this.writeToState(context, '_ID_COUNTER', parseInt(IDCounter) + 1 );
+        return getUuid(`${IDCounter}`);
     }
 
     private getIdentity(context: Context): string {
@@ -95,7 +97,7 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
             }
 
             const product: Product = {
-                ID: this.nextID(),
+                ID: `P#${await this.nextID(context)}`,
                 productName,
                 producer: owner,
                 producedAmount,
@@ -144,7 +146,7 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
             throw Error(`Product with ID ${sourceID} has a total available amount of ${source.availableAmount}${source.unit}, but ${amountTransferred}${source.unit} were requested!`)
         }
         const trade: Trade = {
-            ID: this.nextID(),
+            ID: `T#${await this.nextID(context)}`,
             sourceID: sourceID,
             seller,
             buyer,
@@ -208,7 +210,7 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
     @Transaction()
     public async registerLinkProposal(context: Context, userID: string): Promise<string> {
         const caller = this.getIdentity(context);
-        const linkProposalID = `linkID#${this.nextID()}`;
+        const linkProposalID = `linkID#${await this.nextID(context)}`;
         const linkProposal: LinkProposal = {
             from: caller,
             to: userID,
@@ -235,7 +237,7 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
         const [__, userWalletGroup] = await this.getWalletGroup(context, userID);
         const newWalletGroup = Array.from(new Set([...callerWalletGroup, ...userWalletGroup]));
 
-        const walletGroupId = `walletGroup#${this.nextID()}`;
+        const walletGroupId = `walletGroup#${await this.nextID(context)}`;
         this.writeToState(context, walletGroupId, newWalletGroup);
         newWalletGroup.forEach(userID => {
             this.writeToState(context, `linkToWalletGroup#${userID}`, walletGroupId);
@@ -256,10 +258,10 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
     }
 
     private isProduct(source: Product | Trade): source is Product {
-        return ('producer' in source);
+        return source.ID.startsWith('P#');
     }
     private isTrade(source: Product | Trade): source is Trade {
-        return ('buyer' in source);
+        return source.ID.startsWith('T#');
     }
 
 }
