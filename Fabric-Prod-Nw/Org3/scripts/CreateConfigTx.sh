@@ -26,7 +26,7 @@ Organizations:
     # for cross org gossip communication.  Note, this value is only
     # encoded in the genesis block in the Application section context
     - Host: peer1-org3
-      Port: $PEER1_ORG3_PORT
+      Port: ${PEER_PORTS_ORG3[0]}
 
   # Policies defines the set of policies at this level of the config tree
   # For organization policies, their canonical path is usually

@@ -35,15 +35,23 @@ infoln "Create custom docker-compose file"
 infoln "Create custom configtx.yml file"
 . ./scripts/CreateConfigTx.sh
 
+# infoln "array PEER_PORTS_ORG3=${PEER_PORTS_ORG3[@]}"
+# infoln "Number of entries in PEER_PORTS_ORG3=${#PEER_PORTS_ORG3[@]}"
+
 # Export path of bin files
 export PATH=${PWD}/../Fabric-bin:$PATH
 
 infoln "Registering Org3 peers with TLS CA"
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/tls-ca/crypto/ca-cert.pem
 export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/tls-ca/admin
-fabric-ca-client register -d --id.name peer1-org3 --id.secret peer1PW --id.type peer -u https://0.0.0.0:7052
-fabric-ca-client register -d --id.name peer2-org3 --id.secret peer2PW --id.type peer -u https://0.0.0.0:7052
-
+I=0
+while [ $I -lt ${#PEER_PORTS_ORG3[@]} ]
+do
+  infoln "Registering peer$((I+1))-org3"
+  fabric-ca-client register -d --id.name peer$((I+1))-org3 --id.secret peer1PW --id.type peer -u https://0.0.0.0:7052
+  I=$((I+1))
+done
+exit
 infoln "Setup Org3’s CA"
 docker-compose up -d rca-org3
 
