@@ -40,7 +40,7 @@ This 2 step process preserves both the integrity of the CA (because only CA admi
 While admin identities only need to be registered and enrolled with an “organization CA” that generates identity certificates for both admins and nodes alike, nodes must also be registered and enrolled with a TLS CA. This will create a public/private TLS key pair that nodes use to sign and encrypt their communications.
 
 # File transfer
-It is important to note, that the transfer of files was heavily simplified in this prototype network. In a real production environment, different organizations won't be sharing one filesystem to store their files like they do here.
+It is important to note, that the transfer of certificates and configurations files was heavily simplified in this prototype network. In a real production environment, different organizations won't be sharing one filesystem to store their files like they do here but instead, exchange them out-of-band. Suitable out-of-band exchange methods could be E-Mail, USB Flashdrive, FTPS, Cloud storage, or setting up a shared Docker volume.
 The exchange of the following files would need to happen out-of-band in a real world production environment:
 
 - **TLS CA**
