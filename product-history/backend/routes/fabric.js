@@ -9,9 +9,8 @@ const queryProductHistory = async (req, res, next) => {
     // const user = await getUser(req.user._id)
     try {
         const response = await callChainCode(
-            user,
             'queryProductHistory',
-            req.params.productID
+            req.params.sourceId
         );
         return res.json(response)
     } catch (e) {
@@ -21,7 +20,7 @@ const queryProductHistory = async (req, res, next) => {
 }
 
 fabric.get(
-    '/:productID',
+    '/:sourceId',
     // jwtAuthentication,
     queryProductHistory
 )
