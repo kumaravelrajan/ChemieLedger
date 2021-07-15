@@ -10,7 +10,6 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
     @Transaction()
     public async instantiate(ctx: Context) {
         console.log('Instantiate the contract');
-        await this.writeToState(ctx, '_ID_COUNTER', 0);
     }
 
     @Transaction()
@@ -113,23 +112,34 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
     }
 
     @Transaction()
-    public async deleteRemainingSource(context: Context, sourceID: string): Promise<Product | Trade> {
+    public async setRemainingSource(context: Context, sourceID: string, newAmount: number): Promise<Product | Trade> {
         const source: Product | Trade = await this.readObjectFromState(context, sourceID);
-        if (!this.isProduct(source) || this.isTrade(source)) {
-            throw new Error('The provided ID does not refer to a product!')
+        newAmount = parseFloat('' + newAmount);
+        let walletGroup: string[];
+        if (this.isProduct(source)) {
+            walletGroup = (await this.getWalletGroup(context, source.producer))[1];
+        } else if(this.isTrade(source)) {
+            walletGroup = (await this.getWalletGroup(context, source.buyer))[1];
+        } else {
+            throw new Error('The provided ID does not refer to a valid source!');
         }
-        source.availableAmount = 0;
-        await this.writeToState(context, source.ID, source);
-        return source;
-        
+        if (walletGroup.includes(this.getIdentity(context))) {
+            if(newAmount > source.availableAmount) {
+                throw new Error(`The maximum amount of a source cannot be increased! Availabe: ${source.availableAmount}, Requested: ${newAmount}`);
+            }
+            source.availableAmount = newAmount;
+            await this.writeToState(context, source.ID, source);
+            return source;
+        }
+        throw new Error(`Source with ID ${sourceID} does not belong to the caller!`);
     }
 
     @Transaction()
     public async getProduct(context: Context, productID: string): Promise<Product> {
-        const product = await this.readObjectFromState(context, productID) as Product;
-        if (!this.isProduct(product)) {
+        if (!this.isProduct({ID: productID})) {
             throw new Error('The provided ID does not refer to a product!')
         }
+        const product = await this.readObjectFromState(context, productID) as Product;
         return product;
     }
 
@@ -156,8 +166,8 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
             date: Date.now()
         }
         source.availableAmount = source.availableAmount - amountTransferred;
-        this.writeToState(context, sourceID, source);
-        this.writeToState(context, trade.ID, trade);
+        await this.writeToState(context, sourceID, source);
+        await this.writeToState(context, trade.ID, trade);
         return trade
     }
 
@@ -217,7 +227,7 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
             // Valid for 30min
             validUntil: Date.now() + 1.8e+6
         }
-        this.writeToState(context, linkProposalID, linkProposal);
+        await this.writeToState(context, linkProposalID, linkProposal);
         return linkProposalID;
     }
 
@@ -238,9 +248,9 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
         const newWalletGroup = Array.from(new Set([...callerWalletGroup, ...userWalletGroup]));
 
         const walletGroupId = `walletGroup#${await this.nextID(context)}`;
-        this.writeToState(context, walletGroupId, newWalletGroup);
-        newWalletGroup.forEach(userID => {
-            this.writeToState(context, `linkToWalletGroup#${userID}`, walletGroupId);
+        await this.writeToState(context, walletGroupId, newWalletGroup);
+        newWalletGroup.forEach(async userID => {
+            await this.writeToState(context, `linkToWalletGroup#${userID}`, walletGroupId);
         })
         return newWalletGroup;
     }
@@ -250,17 +260,17 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
         const caller = this.getIdentity(context);
         const [linkToWalletGroup, callerWalletGroup] = await this.getWalletGroup(context, caller);
         if(linkToWalletGroup !== undefined && callerWalletGroup.includes(userID) && caller !== userID) {
-            this.writeToState(context, linkToWalletGroup, callerWalletGroup.splice(callerWalletGroup.indexOf(userID), 1));
+            await this.writeToState(context, linkToWalletGroup, callerWalletGroup.splice(callerWalletGroup.indexOf(userID), 1));
             return callerWalletGroup
         }
         throw new Error(`The provided userID does not exist in the user's wallet group.`)
 
     }
 
-    private isProduct(source: Product | Trade): source is Product {
+    private isProduct(source: {ID: string}): source is Product {
         return source.ID.startsWith('P#');
     }
-    private isTrade(source: Product | Trade): source is Trade {
+    private isTrade(source: {ID: string}): source is Trade {
         return source.ID.startsWith('T#');
     }
 

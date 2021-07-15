@@ -33,7 +33,7 @@ function disconnectFromGateway() {
     gateway.disconnect();
 }
 
-export async function callChainCode(user, chaincode_args) {
+export async function callChainCode(user, ...chaincode_args) {
 	const userIdentity = await wallet.get(user._id.toString());
 	if (!userIdentity) {
         if (!user.x509Identity) {

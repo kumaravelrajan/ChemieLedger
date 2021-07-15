@@ -37,12 +37,13 @@ export interface RecycleChainV1 {
      */
     getProduct(context: Context, productID: string): Promise<Product>;
     /**
-     * Sets the available amount of this source to zero.
+     * Sets the available amount of this source to the given amount.
      * @param {Context} context (Automatically generated) The transaction context
      * @param {string} sourceID the unique ID of the source
+     * @param {number} newAmount New available amount of the source. Must be smaller that the current available amount
      * @returns {Product | Trade} product or trade with the given ID.
      */
-     deleteRemainingSource(context: Context, sourceID: string): Promise<Product | Trade>;
+     setRemainingSource(context: Context, sourceID: string, newAmount: number): Promise<Product | Trade>;
     /**
      * Register a trade of the specified source from the caller to the seller. If the transferred amount will be subtracted from the available amount of the source.
      * @param {Context} context (Automatically generated) The transaction context

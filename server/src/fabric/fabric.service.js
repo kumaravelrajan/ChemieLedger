@@ -1,10 +1,8 @@
 import dotenv from 'dotenv'
-import { updateUser, createUser } from '../services/user.service'
+import { updateUser } from '../services/user.service'
 import  { Wallets } from 'fabric-network'
-import {callChainCode} from './chaincode.service'
 const fs = require('fs')
 const crypto = require('crypto')
-const yaml = require('js-yaml')
 'use strict';
 
 const FabricCAServices = require('fabric-ca-client');
@@ -155,6 +153,7 @@ export async function enrollUser(user) {
 	const encryptedIdentity = encryptX509Identity(x509Identity);
 	user.x509Identity = encryptedIdentity.content
 	user.x509IdentityIV = encryptedIdentity.iv
+	updateUser(user)
 	console.log('Successfully stored encrypted x509Identity in database')
 	return user;
 }
