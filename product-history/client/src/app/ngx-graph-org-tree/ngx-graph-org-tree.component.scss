@@ -2,6 +2,9 @@
   display: block;
   height: inherit;
   width: inherit;
+  .ngx-charts-outer {
+    margin:auto;
+  }
 
   .cardContainer {
     display: block;
@@ -35,4 +38,8 @@
       font-size: 20px;
     }
   }
+}
+
+h1 {
+  text-align: center;
 }
