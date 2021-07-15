@@ -1,5 +1,6 @@
 // Import the express lirbary
 import routes from './routes'
+import { setup } from './fabric/fabric.service'
 const express = require('express')
 const dotenv = require('dotenv')
 const bodyParser = require("body-parser");
@@ -35,6 +36,9 @@ app.set('view engine', 'html');
 // })
 
 app.use('/productHistory', routes)
+
+// Setup fabric
+setup()
 
 // Start the server on port 8080
 app.listen(port, () => console.log(`Listening on port ${port}`));

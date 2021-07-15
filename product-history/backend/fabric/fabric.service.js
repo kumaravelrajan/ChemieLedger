@@ -16,7 +16,7 @@ const caAdminUserPasswd = process.env.CA_ADMIN_PW;
 const mspID = process.env.MSP_ORG;
 const caHostName=process.env.CA_HOST_NAME
 const walletPath = path.join(__dirname, 'wallet');
-const ccpPath = path.join(__dirname, '..', '..', 'assets', 'connectionProfile.json');
+const ccpPath = path.join(__dirname, '..', 'assets', 'connectionProfile.json');
 const algorithm = 'aes-256-ctr';
 export let ccp;
 export let caClient;
@@ -80,7 +80,7 @@ const buildWallet = async () => {
 	}
 }
 
- const enrollAdmin = async () => {
+const enrollAdmin = async () => {
 	// in a real application this would be done on an administrative flow, and only once
 	try {
 		// Check to see if we've already enrolled the admin user.
