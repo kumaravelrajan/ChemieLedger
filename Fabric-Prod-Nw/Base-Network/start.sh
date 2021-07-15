@@ -1,7 +1,13 @@
 #!/bin/bash
 
 set -e
-set -o xtrace
+# Import env.sh
+. ../env.sh
+
+if [ ! $SILENCE_INFOLN_AND_SCRIPT_TRACING ]
+then
+  set -o xtrace
+fi
 
 # println echos string
 function println() {
@@ -11,18 +17,20 @@ function println() {
 C_YELLOW='\033[1;33m'
 C_RESET='\033[0m'
 function infoln() {
-    set +x
-    println "${C_YELLOW}*****************************************${C_RESET}"
-    println "${C_YELLOW} --------> ${1}${C_RESET}"
-    println "${C_YELLOW}*****************************************${C_RESET}"
-    set -x
+    if [ ! $SILENCE_INFOLN_AND_SCRIPT_TRACING ]
+    then
+      set +x
+      println "${C_YELLOW}*****************************************${C_RESET}"
+      println "${C_YELLOW} --------> ${1}${C_RESET}"
+      println "${C_YELLOW}*****************************************${C_RESET}"
+      set -x
+    fi
 }
 
 infoln "Cleaning up previous network (if any) before starting new network"
 ./cleanup.sh
 
 infoln "Create custom docker-compose file"
-. ../env.sh
 . ./scripts/CreateDockerCompose.sh
 
 infoln "Create custom configtx.yml file"
