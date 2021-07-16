@@ -1,0 +1,4 @@
+# Product History Backend
+This express server resolves user request for the product history of the given ID. The server is managed by a registered organization of the blockchain network. The respective certificates must be set in the connection profile in `assets/connectionProfile.json` the respective variables be configured in the `.env` file. The server will then answer user request on `http://localhost:8070/productHistory/ID`. The product history of the asset with the given ID will be queried from the chaincode and return to the client. 
+
+This server also showcasts how a QR code can be generated that redirects users to the repective client website. For this navigate to `http://localhost:8070/product-history/ID` in your browser. The website will display a QR code that redirect to the client website showing the product history of the respective asset. 
