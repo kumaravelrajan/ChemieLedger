@@ -1,6 +1,10 @@
 # Client
 
+The client offers a graphical view of the product history. Navigate to `http://localhost:4200/history/ID` to see the product history of the product with the given ID. To retreive the information, the client call a backend server. The backend server url can be configured in the `src/environments/` files.
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.1.2.
+
+The graph visualization is done by `@swimlane/ngx-graph` (cf. offical example code).
 
 ## Development server
 

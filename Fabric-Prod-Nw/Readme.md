@@ -1,27 +1,27 @@
 # Overview of blockchain network 
-The blockchain network can be setup using the given scripts in this repo. We recognize the need for a consortium blockchain network to be flexible as new organizations may always want to join the consortium. For this purpose, we have the following types of blockchain network deployments possible - 
+The blockchain network can be setup using the given scripts in this repo. We recognize the need for a consortium blockchain network to be flexible as new organizations may always want to join the consortium. For this purpose, we offer the following types of blockchain network deployments:- 
 
 1. **Base network**:
   Simulates a scenario where two organizations build a consortium, create a new blockchain network and set up a channel.
 
 2. **Base network + new organisation Org3**:
-  Simulates a scenario where two organizations build a consortium, create a new blockchain network and set up a channel. Lateron, a new organisation "Org3" joins the network and the channel, after being approved by the other organizations. 
+  Simulates a scenario where two organizations build a consortium, create a new blockchain network and set up a channel. Later, a new organisation "Org3" joins the network and the channel, after being approved by the other organizations. 
 
 # Base network 
 - **Startup script:** Fabric-Prod-Nw/Main-Docker-Compose/start.sh
-- **Participants**:
+- **Participants:**
   - Peer orgnizations = 2 (org1 and org2)
   - Orderer organizations = 1 (org0)
-- Tool used for certificate generation: Fabric CA
+- **Tool used for certificate generation:** Fabric CA
   - Each organization (peer and orderer orgs) has its own organization CA
   - All organizations share the same TLS CA server. The TLS CA is used to encrypt communication between the fabric network nodes.
 
 # Base network + new organisation Org3
 - **Startup script:** Fabric-Prod-Nw/Org3/startOrg3.sh
-- **Participants**:
+- **Participants:**
   - Peer organizations = 3 (Org1, Org2, Org3)
   - Orderer organizations = 1 (Org0)
-- Tool used for certificate generation: Fabric CA
+- **Tool used for certificate generation:** Fabric CA
   - Each organization (peer and orderer orgs) has its own organization CA
   - All organizations share the same TLS CA server. The TLS CA is used to encrypt communication between the fabric network nodes.
 

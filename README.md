@@ -1,11 +1,16 @@
 # ChemieCluster_DLT4PI
 
-The blockchain repository for ChemieCluster's use case.
+This repository implements a proof on concept solution for a cross-platform blockchain network focused on providing a proof of origin for bio-based products within a recycle supply chain. To show the simple integration in a platform, the [Rohstoffbörse](https://xn--rohstoffbrse-djb.com/home) is used. The original repository can be found [here](https://git.fortiss.org/RB).
+The project was conducted in the framework of the TUM university course *Advanced Practical Course - Blockchain technology for public sector innovation (IN2106, IN4212)*.
 
-## Important links - 
-- [User Stories](https://docs.google.com/document/d/1Y3PwSdojupU_ZW-NGgJf2lpINRUwab12CxhpRiXYSic/edit?usp=sharing)  
-- [OneDrive](https://tumde-my.sharepoint.com/:f:/g/personal/leonie_karb_tum_de/EtntkmO4rDlBi26w8ly-IYEBuk5O1IUiSwqNKaAX6hkTKQ?e=CdbCk4)
-- [Research topics](https://docs.google.com/document/d/1yCMPRwgHRPKA0jaCtZSMGuv33O2ja4qcje26ctTfBbs/edit?usp=sharing)
-- [Rohstoffboerse-by Fortiss](https://git.fortiss.org/RB)
-- [Blockchain research](https://docs.google.com/document/d/1NmyFKwBh1NVFMifMYfZyD00RWrnw5QZlaIJuj4dYCpc/edit?usp=sharing)
-- [Hyperledger Fabric](https://docs.google.com/document/d/1eGfT4uWQRGJ9JSbf6By4FNxupRlvFiG94IYJhwfGP6o/edit?usp=sharing )
+## Folder Structure:
+- `/client`: The Rohstoffbörse frontend component. This folder does not contain any novel code contributions but was only used for testing.
+- `/server`: The Rohstoffbörse backend server.
+    - `/server/src/fabric`: This subfolder takes care of user enrollment and identity management.
+    - `/server/src/routes/fabric.js`: This file provides a exemplary API that shows how to call the chaincode.
+- `/database`: A MongoDB database connected to the Rohstoffbörse backend server. It stores users and an encrypted version of the identities.
+- `/product-history`: This seperate service consists of a frontend and a backend component and provides the possibility for end users to see a visual representation of the product history.
+    - `/product-history/client`: The Angular client service that displays the product history. Scanned QR codes would redirect users to this page.
+    - `/product-history/backend`: The express backend server that queries the chaincode to retrieve the product history.
+
+Please refer to the respective folders to get more information.
