@@ -63,6 +63,7 @@ done
 
 infoln "Setup Org3’s CA"
 docker-compose up -d rca-org3
+sleep 5
 
 infoln "Enroll Org3’s CA Admin"
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org3/ca/crypto/ca-cert.pem
@@ -165,6 +166,8 @@ docker exec -it cli-org1 sh -c 'export CORE_PEER_TLS_ENABLED=true \
 && export CORE_PEER_ADDRESS=peer1-org1:7051 \
 && peer channel fetch config /tmp/hyperledger/org1/peer1/assets/mychannel.pb -o orderer1-org0:'"$ORDERER1_ORG0_PORT"' -c mychannel --tls --cafile "/tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem"'
 
+sleep 5
+
 infoln "Successfully fetched latest configuration block"
 
 infoln "Converting configuration block to JSON"
@@ -192,6 +195,7 @@ infoln "Org1 admin sign..."
 # ToDo may need to adjust path
 cp /tmp/hyperledger/org3/peer1/assets/org3_update_in_envelope.pb /tmp/hyperledger/org1/peer1/assets/org3_update_in_envelope.pb
 docker exec -it cli-org1 sh -c "peer channel signconfigtx -f /tmp/hyperledger/org1/peer1/assets/org3_update_in_envelope.pb"
+sleep 5
 
 infoln "Org2 admin sign..."
 cp /tmp/hyperledger/org1/peer1/assets/org3_update_in_envelope.pb /tmp/hyperledger/org2/peer1/assets/org3_update_in_envelope.pb
@@ -202,6 +206,7 @@ docker exec -it cli-org2 sh -c 'export CORE_PEER_TLS_ENABLED=true \
 && export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp \
 && export CORE_PEER_ADDRESS=peer1-org2:7051 \
 && peer channel update -f /tmp/hyperledger/org2/peer1/assets/org3_update_in_envelope.pb -c mychannel -o orderer1-org0:'"$ORDERER1_ORG0_PORT"' --tls --cafile /tmp/hyperledger/org2/peer1/assets/tls-ca/tls-ca-cert.pem'
+sleep 5
 
 infoln "Channel update of org3 successful."
 
@@ -210,6 +215,7 @@ cd $ORG3PATH
 
 infoln "Create org3 CLI Container"
 docker-compose up -d cli-org3
+sleep 5
 
 infoln "Org3 Join Channel"
 
