@@ -96,6 +96,8 @@ The following system requirements need to be installed to run the scripts:
 - Docker Compose version 1.14.0 or greater
 - Node version 12.16.1
 - npm version 6.4.1 or greater
+- yarn 
+- jq (https://stedolan.github.io/jq/)
 
 # Running the scripts
 
