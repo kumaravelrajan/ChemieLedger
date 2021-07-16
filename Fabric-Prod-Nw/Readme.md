@@ -93,6 +93,7 @@ Respective file:
 - Docker Compose version 1.14.0+
 - Node version 12.16.1+
 - npm version 6.4.1+
+- yarn 
 
 # Running the scripts
 **Note:** The two scripts have to be started from within their respective directories. Also, the scripts have to be run as the root user of the system.
