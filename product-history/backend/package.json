@@ -1,0 +1,28 @@
+{
+  "name": "product-history",
+  "version": "1.0.0",
+  "description": "Display product history with QR Code",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "server": "nodemon --watch src --exec babel-node -- index.js",
+    "build": ""
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.6.4",
+    "@babel/node": "^7.6.3",
+    "@babel/preset-env": "^7.6.3",
+    "eslint": "^7.30.0",
+    "nodemon": "^2.0.12"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "qrcode": "^1.4.4",
+    "fabric-network": "^2.2.8",
+    "fabric-ca-client": "^2.2.8"
+  }
+}

@@ -195,18 +195,19 @@ describe('Recycle-Chain', () => {
       p5.productMaterial[trade4.ID] = 0.2
       ctx.clientIdentity = userC
       p5 = await cc.addProduct(ctx, ...parseArgs(p5, keys) as [string, number, Unit, number, string, string, string])
+      let trade5: Trade = await cc.addTrade(ctx, p5.ID, userAID, 0.25);
       
-      const productHistory: ProductHistory = await cc.queryProductHistory(ctx, p5.ID);
+      const productHistory: ProductHistory = await cc.queryProductHistory(ctx, trade5.ID);
       console.log(JSON.stringify(productHistory))
       expect(productHistory.ID).to.equal(p5.ID);
       expect(productHistory.productMaterial[0].product.ID).to.equal(p3.ID);
-      expect(productHistory.productMaterial[0].usedAmount).to.equal(3.5);
+      expect(productHistory.productMaterial[0].usedAmount).to.equal((0.25/0.42) * 3.5);
       expect(productHistory.productMaterial[1].product.ID).to.equal(p4.ID);
-      expect(productHistory.productMaterial[1].usedAmount).to.equal(0.2);
+      expect(productHistory.productMaterial[1].usedAmount).to.equal((0.25/0.42) * 0.2);
       expect(productHistory.productMaterial[0].product.productMaterial[0].product.ID).to.equal(p1.ID);
-      expect(productHistory.productMaterial[0].product.productMaterial[0].usedAmount).to.equal((3.5/p3.producedAmount)*p3.productMaterial[p1.ID]);
+      expect(productHistory.productMaterial[0].product.productMaterial[0].usedAmount).to.equal((((0.25/0.42) * 3.5)/p3.producedAmount)*p3.productMaterial[p1.ID]);
       expect(productHistory.productMaterial[0].product.productMaterial[1].product.ID).to.equal(p2.ID);
-      expect(productHistory.productMaterial[0].product.productMaterial[1].usedAmount).to.equal((3.5/p3.producedAmount)*p3.productMaterial[p2.ID]);
+      expect(productHistory.productMaterial[0].product.productMaterial[1].usedAmount).to.equal((((0.25/0.42) * 3.5)/p3.producedAmount)*p3.productMaterial[p2.ID]);
     })
   });
 
