@@ -4,6 +4,6 @@ import fabric from './fabric'
 
 const router = express.Router()
 
-router.use('/', cors({ methods: 'GET, POST' }), fabric)
+router.use('/', cors({ methods: 'GET' }), fabric)
 
 module.exports = router

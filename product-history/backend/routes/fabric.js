@@ -1,12 +1,10 @@
-import express, { response } from 'express'
+import express from 'express'
 import { callChainCode } from '../fabric/chaincode.service'
-// import { jwtAuthentication } from './middlewares/passport'
-// import { getUser } from '../services/user.service'
 
 const fabric = express.Router()
 
 const queryProductHistory = async (req, res, next) => {
-    // const user = await getUser(req.user._id)
+    console.log(req.params.sourceId)
     try {
         const response = await callChainCode(
             'queryProductHistory',
@@ -21,7 +19,6 @@ const queryProductHistory = async (req, res, next) => {
 
 fabric.get(
     '/:sourceId',
-    // jwtAuthentication,
     queryProductHistory
 )
 

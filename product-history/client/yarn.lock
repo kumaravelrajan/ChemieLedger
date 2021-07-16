@@ -5360,6 +5360,13 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
+ngx-loading@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/ngx-loading/-/ngx-loading-8.0.0.tgz#0d5b64178f45fe56d09598ece305b6b740f3c8bc"
+  integrity sha512-22q7/ILp0rswl7m3OkKZdIK7rHs7wojd2mGRfxgWWug7C29d3hWL7GE+h1sm12UZMS7VDXSFyTc6wO7APRYJ0Q==
+  dependencies:
+    tslib "^1.9.0"
+
 nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"

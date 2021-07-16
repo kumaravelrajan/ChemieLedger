@@ -1,16 +1,20 @@
 <h1>Product history for asset {{sourceID}}:</h1>
+<p *ngIf="notFound">Asset with this ID could not be found! Showing mock data instead</p>
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading> 
 <ngx-graph
+*ngIf="!loading"
   [view]="[1200, 800]"
   [links]="links"
   [nodes]="nodes"
   [curve]="curve"
   [layout]="layout"
   [nodeWidth]="600"
-  [nodeHeight]="120"
+  [nodeHeight]="140"
   [layoutSettings]="layoutSettings"
   [enableZoom]="true"
   [autoZoom]="true"
 >
+  
   <ng-template #defsTemplate>
     <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4" markerHeight="4" orient="auto">
       <svg:path d="M0,-5L10,0L0,5" class="arrow-head" />
@@ -19,19 +23,20 @@
 
   <ng-template #nodeTemplate let-node>
     <svg:g class="node">
-      <svg:foreignObject width="600" height="120">
+      <svg:foreignObject width="600" height="140">
         <xhtml:div class="cardContainer" [ngStyle]="getStyles(node)">
         <ng-container *ngIf="node.data.productName">
           <label class="name"><strong>Product: </strong>{{ node.label }}</label>
           <label><strong>Producer: </strong>{{ node.data.producer }}</label>
           <label><strong>Date of production: </strong>{{ node.data.dateOfProduction }}</label>
+          <label><strong>Amount: </strong> {{ node.data.amount }}</label>
         </ng-container>
         <ng-container *ngIf="!node.data.productName">
-          <label class="name"><strong>{{ node.label }}</strong></label>
+          <label class="name"><strong>Retail</strong></label>
           <label><strong>Retailer: </strong> {{ node.data.owner }}</label>
           <label><strong>Received: </strong> {{ node.data.received }}</label>
+          <br/>
         </ng-container> 
-        
         </xhtml:div>
       </svg:foreignObject>
     </svg:g>
