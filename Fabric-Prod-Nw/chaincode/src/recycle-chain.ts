@@ -179,6 +179,13 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
 
     private async buildProductHistoryRec(context: Context, sourceID: string, amountFactor: number): Promise<ProductHistory> {
         let source: Product| Trade = await this.readObjectFromState(context, sourceID);
+        if (amountFactor == -1) {
+            if (this.isProduct(source)) {
+                amountFactor = source.producedAmount;
+            } else {
+                amountFactor = source.amountTransferred;
+            }
+        }
         const listOfOwnership: {owner: string, received: number}[] = [];
         while(!this.isProduct(source)) {
             listOfOwnership.push({owner: source.buyer, received: source.date });
@@ -186,7 +193,6 @@ export class RecycleChainContract extends Contract implements RecycleChainV1 {
         }
         const product: Product = source;
         listOfOwnership.push({owner: product.producer, received: product.dateOfProduction })
-        if (amountFactor == -1) {amountFactor = product.producedAmount}
         amountFactor /=  product.producedAmount
         const productHistory: ProductHistory = {
             ...product,
