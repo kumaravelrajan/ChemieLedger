@@ -1,10 +1,13 @@
-# Overview of blockchain network - 
+# Overview of blockchain network 
 The blockchain network can be setup using the given scripts in this repo. We recognize the need for a consortium blockchain network to be flexible as new organizations may always want to join the consortium. For this purpose, we have the following types of blockchain network deployments possible - 
 
-1. **Base network**
-1. **Additional organization (Org3) in base network**
+1. **Base network**:
+  Simulates a scenario where two organizations build a consortium, create a new blockchain network and set up a channel.
 
-# Base network: 
+2. **Base network + new organisation Org3**:
+  Simulates a scenario where two organizations build a consortium, create a new blockchain network and set up a channel. Lateron, a new organisation "Org3" joins the network and the channel, after being approved by the other organizations. 
+
+# Base network 
 - **Startup script:** Fabric-Prod-Nw/Main-Docker-Compose/start.sh
 - **Participants**:
   - Peer orgnizations = 2 (org1 and org2)
@@ -13,11 +16,11 @@ The blockchain network can be setup using the given scripts in this repo. We rec
   - Each organization (peer and orderer orgs) has its own organization CA
   - All organizations share the same TLS CA server. The TLS CA is used to encrypt communication between the fabric network nodes.
 
-# Additional organization (Org3) in base network:
+# Base network + new organisation Org3
 - **Startup script:** Fabric-Prod-Nw/Org3/startOrg3.sh
 - **Participants**:
-  - Peer orgnizations = 3 (org1, org2, org3)
-  - Orderer organizations = 1 (org0)
+  - Peer organizations = 3 (Org1, Org2, Org3)
+  - Orderer organizations = 1 (Org0)
 - Tool used for certificate generation: Fabric CA
   - Each organization (peer and orderer orgs) has its own organization CA
   - All organizations share the same TLS CA server. The TLS CA is used to encrypt communication between the fabric network nodes.
@@ -87,24 +90,62 @@ Respective file:
   - `/tmp/hyperledger/org1/peer1/assets/org3_update_in_envelope.pb"`
 
 # Requirements
-
+The following system requirements need to be installed to run the scripts:
 - Linux OS, e.g. Ubuntu 18.4
-- Docker version 17.06.2-ce+
-- Docker Compose version 1.14.0+
-- Node version 12.16.1+
-- npm version 6.4.1+
+- Docker version 17.06.2-ce or greater
+- Docker Compose version 1.14.0 or greater
+- Node version 12.16.1
+- npm version 6.4.1 or greater
 
 # Running the scripts
-**Note:** The two scripts have to be started from within their respective directories. Also, the scripts have to be run as the root user of the system.
 
-For example, to start the base network alone - 
+**Note:** The two scripts have to be started from within their respective directories. The scripts have to be run as the root user of the system. Also note that at the beginning of each script, it **cleans up** any previously running network and files associated with it. 
+
+To start the base network alone, run the following command:
 ```bash
-cd Fabric-Prod-Nw/Main-Docker-Compose/
+cd Fabric-Prod-Nw/Base-Network/
 sudo ./start.sh
 ```
-To start the base network and then to add organization 3 to the channel - 
+To start the base network and then to add organization 3 to the channel, run the following command: 
 ```bash
 cd Fabric-Prod-Nw/Org3/
 sudo ./startOrg3.sh
 ```
+To manually clean the base network, run the following command:
+```bash
+cd Fabric-Prod-Nw/Base-Network/
+sudo ./cleanup.sh
+```
+To manually clean the base network together with Org3, run the following command:
+```bash
+cd Fabric-Prod-Nw/Org3/
+sudo ./cleanup.sh
+```
 
+# Customization
+It is possible to customize the Port settings of the base network by editing the respective variables in `env.sh`
+Additionally, the Port settings, as well as the number of peers the new organisation Org3 has, can be customized by editing the following line:
+```bash
+declare -a PEER_PORTS_ORG3=('12051' '13051' '14051' '15051')
+```
+Any new String number entered will create an additional peer. 
+At last, the info lines and script tracing can be turned on and off by editing the following variable:
+```bash
+SILENCE_INFOLN_AND_SCRIPT_TRACING=true
+```
+
+# Troubleshoot
+**Device or ressource busy**
+
+When running the `cleanup.sh` script (standalone or a the beginning of `start.sh` \ `startOrg3.sh`), it can occur that it fails to remove a directory.
+
+**Solution**
+
+Restart Docker:
+- Docker installed on Linux:
+```bash
+service docker restart
+```
+- Docker-Desktop installed on Windows (used as Backend for a Linux distro on WSL 2):
+1. Right click the Docker-Desktop icon in your task bar.
+2. Select "Restart Docker..." option
