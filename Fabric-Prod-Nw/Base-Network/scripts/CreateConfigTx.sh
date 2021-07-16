@@ -1,3 +1,6 @@
+#!/bin/bash
+. ../env.sh
+cat <<EOT >> ./configtx.yaml
 ################################################################################
 #
 #   Section: Organizations
@@ -47,7 +50,7 @@ Organizations:
       # for cross org gossip communication.  Note, this value is only
       # encoded in the genesis block in the Application section context
       - Host: peer1-org1
-        Port: 7051
+        Port: $PEER1_ORG1_PORT
 
    # Policies defines the set of policies at this level of the config tree
    # For organization policies, their canonical path is usually
@@ -81,7 +84,7 @@ Organizations:
       # for cross org gossip communication.  Note, this value is only
       # encoded in the genesis block in the Application section context
       - Host: peer1-org2
-        Port: 7051
+        Port: $PEER1_ORG2_PORT
         
    # Policies defines the set of policies at this level of the config tree
    # For organization policies, their canonical path is usually
@@ -193,6 +196,7 @@ Application: &ApplicationDefaults
    Capabilities:
         <<: *ApplicationCapabilities
 
+
 ################################################################################
 #
 #   CHANNEL
@@ -242,7 +246,7 @@ Profiles:
          # Available types are "solo" and "kafka"
          OrdererType: solo
          Addresses:
-            - orderer1-org0:7050
+            - orderer1-org0:$ORDERER1_ORG0_PORT
 
          # Batch Timeout: The amount of time to wait before creating a batch
          BatchTimeout: 2s
@@ -313,3 +317,4 @@ Profiles:
             - *org2
          Capabilities:
             <<: *ApplicationCapabilities
+EOT

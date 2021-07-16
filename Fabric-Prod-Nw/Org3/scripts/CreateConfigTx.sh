@@ -1,3 +1,6 @@
+#!/bin/bash
+. ../env.sh
+cat <<EOT >> ./configtx.yaml
 ################################################################################
 #
 #   Section: Organizations
@@ -23,7 +26,7 @@ Organizations:
     # for cross org gossip communication.  Note, this value is only
     # encoded in the genesis block in the Application section context
     - Host: peer1-org3
-      Port: 7051
+      Port: ${PEER_PORTS_ORG3[0]}
 
   # Policies defines the set of policies at this level of the config tree
   # For organization policies, their canonical path is usually
@@ -41,3 +44,4 @@ Organizations:
       Endorsement:
           Type: Signature
           Rule: "OR('org3MSP.peer', 'org3MSP.admin')"
+EOT
