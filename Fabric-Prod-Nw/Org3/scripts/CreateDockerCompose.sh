@@ -44,7 +44,7 @@ services:
             - CORE_PEER_ID=peer1-org3
             - CORE_PEER_ADDRESS=peer1-org3:$CURRENT_PEER_PORT_ORG3
             - CORE_PEER_LISTENADDRESS=0.0.0.0:$CURRENT_PEER_PORT_ORG3
-            - CORE_PEER_CHAINCODEADDRESS=peer1-org1:$((CURRENT_PEER_PORT_ORG3+1))
+            - CORE_PEER_CHAINCODEADDRESS=peer1-org3:$((CURRENT_PEER_PORT_ORG3+1))
             - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:$((CURRENT_PEER_PORT_ORG3+1))
             - CORE_PEER_LOCALMSPID=org3MSP
             - CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/peer1/msp
@@ -81,7 +81,7 @@ services:
             - CORE_PEER_LOCALMSPID=org3MSP
             - CORE_PEER_TLS_ENABLED=true
             - CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org3/peer1/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
-            - CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/peer1/msp
+            - CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/admin/msp
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/org3
         command: sh
         volumes:
@@ -102,7 +102,7 @@ EOT
             - CORE_PEER_ID=peer$I-org3
             - CORE_PEER_ADDRESS=peer$I-org3:$CURRENT_PEER_PORT_ORG3
             - CORE_PEER_LISTENADDRESS=0.0.0.0:$CURRENT_PEER_PORT_ORG3
-            - CORE_PEER_CHAINCODEADDRESS=peer1-org1:$((CURRENT_PEER_PORT_ORG3+1))
+            - CORE_PEER_CHAINCODEADDRESS=peer1-org3:$((CURRENT_PEER_PORT_ORG3+1))
             - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:$((CURRENT_PEER_PORT_ORG3+1))
             - CORE_PEER_LOCALMSPID=org3MSP
             - CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org3/peer$I/msp
