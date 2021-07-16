@@ -71,8 +71,6 @@ The peers will use this to create the genesis block of the channel `mychannel.bl
 This genesis block needs then to be transferred to the rest of the organization's peers out-of-band.
 Respective file:
   - `/tmp/hyperledger/org0/orderer/channel.tx`
-
-Respective files:
   - `/tmp/hyperledger/org1/peer1/assets/mychannel.block`
   - `/tmp/hyperledger/org2/peer1/assets/mychannel.block`
   - `/tmp/hyperledger/org3/peer1/assets/mychannel.block`
