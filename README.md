@@ -1,3 +1,6 @@
+![Header](images/header.png)
+
+
 # ChemieCluster_DLT4PI
 
 This repository implements a proof on concept solution for a cross-platform blockchain network focused on providing a proof of origin for bio-based products within a recycle supply chain. To show the simple integration in a platform, the [Rohstoffbörse](https://xn--rohstoffbrse-djb.com/home) is used. The original repository can be found [here](https://git.fortiss.org/RB).
